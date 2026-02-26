@@ -1,8 +1,35 @@
-﻿@{
-    ViewData["Title"] = "Home Page";
+@model Fisherman_Board.Models.CaseBriefViewModel
+
+@{
+    ViewData["Title"] = Model.PageTitle;
 }
 
-<div class="text-center">
-    <h1 class="display-4">Welcome</h1>
-    <p>Learn about <a href="https://learn.microsoft.com/aspnet/core">building Web apps with ASP.NET Core</a>.</p>
-</div>
+<article class="academic-case">
+    <header class="academic-case__header">
+        <p class="academic-case__eyebrow">@Model.Eyebrow</p>
+        <h1>@Model.Heading</h1>
+        <p class="academic-case__subtitle">@Model.Subtitle</p>
+    </header>
+
+    @foreach (var caseSection in Model.Sections)
+    {
+        <div class="academic-case__section">
+            <h2>@caseSection.Title</h2>
+
+            @foreach (var paragraph in caseSection.Paragraphs)
+            {
+                <p>@Html.Raw(paragraph)</p>
+            }
+
+            @if (caseSection.BulletPoints.Count > 0)
+            {
+                <ul>
+                    @foreach (var bulletPoint in caseSection.BulletPoints)
+                    {
+                        <li>@bulletPoint</li>
+                    }
+                </ul>
+            }
+        </div>
+    }
+</article>
