@@ -4,34 +4,90 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>@ViewData["Title"] - Fisherman_Board</title>
-    <script type="importmap"></script>
+
     <link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.min.css" />
     <link rel="stylesheet" href="~/css/site.css" asp-append-version="true" />
     <link rel="stylesheet" href="~/Fisherman_Board.styles.css" asp-append-version="true" />
 </head>
+
 <body>
     <header>
-        <nav class="navbar navbar-expand-sm navbar-toggleable-sm navbar-light bg-white border-bottom box-shadow mb-3">
+        <nav class="navbar navbar-expand-sm navbar-light bg-white border-bottom box-shadow mb-3">
             <div class="container-fluid">
-                <a class="navbar-brand" asp-area="" asp-controller="Home" asp-action="Index">Fisherman_Board</a>
-                <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target=".navbar-collapse" aria-controls="navbarSupportedContent"
-                        aria-expanded="false" aria-label="Toggle navigation">
+
+                <a class="navbar-brand" asp-controller="Home" asp-action="Index">
+                    Fisherman_Board
+                </a>
+
+                <button class="navbar-toggler" type="button" data-bs-toggle="collapse"
+                        data-bs-target=".navbar-collapse">
                     <span class="navbar-toggler-icon"></span>
                 </button>
+
                 <div class="navbar-collapse collapse d-sm-inline-flex justify-content-between">
+
+                    <!-- LEFT MENU -->
                     <ul class="navbar-nav flex-grow-1">
+
                         <li class="nav-item">
-                            <a class="nav-link text-dark" asp-area="" asp-controller="Home" asp-action="Index">Home</a>
+                            <a class="nav-link text-dark" asp-controller="Home" asp-action="Index">Начало</a>
                         </li>
+
+                        <!-- Кораби -->
                         <li class="nav-item">
-                            <a class="nav-link text-dark" asp-area="" asp-controller="Home" asp-action="Privacy">Privacy</a>
+                            <a class="nav-link text-dark" asp-controller="FishingVessels" asp-action="Index">Кораби</a>
                         </li>
+
+                        <!-- Двигатели -->
+                        <li class="nav-item">
+                            <a class="nav-link text-dark" asp-controller="Engines" asp-action="Index">Двигатели</a>
+                        </li>
+
+                        <!-- Хора -->
+                        <li class="nav-item">
+                            <a class="nav-link text-dark" asp-controller="People" asp-action="Index">Хора</a>
+                        </li>
+
+                        <!-- Разрешителни -->
+                        <li class="nav-item">
+                            <a class="nav-link text-dark" asp-controller="FishingPermits" asp-action="Index">Разрешителни</a>
+                        </li>
+
+                        <!-- Излети -->
+                        <li class="nav-item">
+                            <a class="nav-link text-dark" asp-controller="FishingTrips" asp-action="Index">Излети</a>
+                        </li>
+
+                        <!-- Улов -->
+                        <li class="nav-item">
+                            <a class="nav-link text-dark" asp-controller="CatchRecords" asp-action="Index">Улов</a>
+                        </li>
+
+                        <!-- Любителски билети -->
+                        <li class="nav-item">
+                            <a class="nav-link text-dark" asp-controller="RecreationalTickets" asp-action="Index">Любителски билети</a>
+                        </li>
+
+                        <!-- Любителски улов -->
+                        <li class="nav-item">
+                            <a class="nav-link text-dark" asp-controller="RecreationalCatches" asp-action="Index">Любителски улов</a>
+                        </li>
+
+                        <!-- Справки -->
+                        <li class="nav-item">
+                            <a class="nav-link text-dark" asp-controller="Reports" asp-action="Index">Справки</a>
+                        </li>
+
                     </ul>
+
+                    <!-- LOGIN / REGISTER -->
                     <partial name="_LoginPartial" />
+
                 </div>
             </div>
         </nav>
     </header>
+
     <div class="container">
         <main role="main" class="pb-3">
             @RenderBody()
@@ -40,12 +96,15 @@
 
     <footer class="border-top footer text-muted">
         <div class="container">
-            &copy; 2026 - Fisherman_Board - <a asp-area="" asp-controller="Home" asp-action="Privacy">Privacy</a>
+            &copy; 2026 - Fisherman_Board -
+            <a asp-controller="Home" asp-action="Privacy">Privacy</a>
         </div>
     </footer>
+
     <script src="~/lib/jquery/dist/jquery.min.js"></script>
     <script src="~/lib/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
     <script src="~/js/site.js" asp-append-version="true"></script>
+
     @await RenderSectionAsync("Scripts", required: false)
 </body>
 </html>

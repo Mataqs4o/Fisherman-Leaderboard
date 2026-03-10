@@ -1,8 +1,11 @@
 using Fisherman_Board.Data;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
+using Fisherman_Board.Data;
 
-namespace Fisherman_Board
+
+namespace Fisherman_Board.Models
+
 {
     public class Program
     {
