@@ -52,6 +52,10 @@ namespace Fisherman_Board.Data
                 .WithMany(p => p.CaptainPermits)
                 .HasForeignKey(fp => fp.CaptainId)
                 .OnDelete(DeleteBehavior.Restrict);
+
+            builder.Entity<RecreationalTicket>()
+                .Property(ticket => ticket.Price)
+                .HasPrecision(18, 2);
         }
     }
 }
