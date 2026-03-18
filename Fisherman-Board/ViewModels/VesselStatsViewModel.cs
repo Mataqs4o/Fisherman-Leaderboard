@@ -2,7 +2,7 @@
 {
     public class VesselStatsViewModel
     {
-        public string VesselMarking { get; set; }
+        public string VesselMarking { get; set; } = string.Empty;
         public int TripsCount { get; set; }
         public double TotalCatchKg { get; set; }
 
