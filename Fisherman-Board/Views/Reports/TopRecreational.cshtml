@@ -1,0 +1,56 @@
+@model IEnumerable<Fisherman_Board.ViewModels.TopRecreationalViewModel>
+@{
+    ViewData["Title"] = "Топ любители";
+    var search = ViewData["Search"]?.ToString() ?? string.Empty;
+    var rank = 0;
+}
+
+<section class="page-header-card">
+    <div>
+        <span class="eyebrow">Справка 2</span>
+        <h1>Класация на рибарите любители</h1>
+    </div>
+    <p>Подреждане по общо количество регистриран улов за последните 12 месеца.</p>
+</section>
+
+<section class="toolbar-card">
+    <form class="search-form" method="get">
+        <input type="search" name="search" value="@search" placeholder="Търсене по име" />
+        <button type="submit" class="btn btn-primary-soft">Търси</button>
+        <a class="btn btn-ghost" asp-action="TopRecreational">Изчисти</a>
+    </form>
+    <a class="btn btn-ghost" asp-action="Index">Назад към справките</a>
+</section>
+
+@if (!Model.Any())
+{
+    <section class="content-card empty-state-card">
+        <h2>Няма резултати</h2>
+        <p>За последната година няма данни за любителски улов.</p>
+    </section>
+}
+else
+{
+    <section class="table-card">
+        <table class="table table-app">
+            <thead>
+                <tr>
+                    <th>#</th>
+                    <th>Рибар</th>
+                    <th>Общ улов (кг)</th>
+                </tr>
+            </thead>
+            <tbody>
+            @foreach (var item in Model)
+            {
+                rank++;
+                <tr>
+                    <td><span class="table-pill">@(rank)</span></td>
+                    <td>@item.FisherName</td>
+                    <td>@item.TotalKg.ToString("F2")</td>
+                </tr>
+            }
+            </tbody>
+        </table>
+    </section>
+}

@@ -1,0 +1,73 @@
+@model IEnumerable<Fisherman_Board.Models.FishingVessel>
+@{
+    ViewData["Title"] = "Лодки";
+    var search = ViewData["Search"]?.ToString() ?? string.Empty;
+}
+
+<section class="page-header-card">
+    <div>
+        <span class="eyebrow">Регистър</span>
+        <h1>Лодки</h1>
+    </div>
+    <p>Преглед и редакция на идентификационни и технически характеристики на лодките.</p>
+</section>
+
+<section class="toolbar-card">
+    <form class="search-form" method="get">
+        <input type="search" name="search" value="@search" placeholder="Търсене по маркировка, позивна, номер или двигател" />
+        <button type="submit" class="btn btn-primary-soft">Търси</button>
+        <a class="btn btn-ghost" asp-action="Boats">Изчисти</a>
+    </form>
+    <div class="toolbar-actions">
+        <a class="btn btn-primary-soft" asp-action="CreateBoat">Добави лодка</a>
+        <a class="btn btn-ghost" asp-action="Index">Назад</a>
+    </div>
+</section>
+
+@if (!Model.Any())
+{
+    <section class="content-card empty-state-card">
+        <h2>Няма записи</h2>
+        <p>Добавете лодка, за да започнете да попълвате таблицата.</p>
+    </section>
+}
+else
+{
+    <section class="table-card">
+        <table class="table table-app">
+            <thead>
+                <tr>
+                    <th>Маркировка</th>
+                    <th>Международен номер</th>
+                    <th>Позивна</th>
+                    <th>Размери</th>
+                    <th>Тонаж</th>
+                    <th>Двигател</th>
+                    <th class="text-end">Действия</th>
+                </tr>
+            </thead>
+            <tbody>
+            @foreach (var vessel in Model)
+            {
+                <tr>
+                    <td>@vessel.Marking</td>
+                    <td>@vessel.InternationalNumber</td>
+                    <td>@vessel.CallSign</td>
+                    <td>@vessel.Length.ToString("F1") x @vessel.Width.ToString("F1") м</td>
+                    <td>@vessel.Tonnage.ToString("F1")</td>
+                    <td>@vessel.Engine.Type</td>
+                    <td>
+                        <div class="table-actions">
+                            <a class="btn btn-row" asp-action="EditBoat" asp-route-id="@vessel.Id">Редакция</a>
+                            <form asp-action="DeleteBoat" asp-route-id="@vessel.Id" method="post" onsubmit="return confirm('Сигурни ли сте, че искате да изтриете тази лодка?');">
+                                @Html.AntiForgeryToken()
+                                <button type="submit" class="btn btn-row btn-row-danger">Изтрий</button>
+                            </form>
+                        </div>
+                    </td>
+                </tr>
+            }
+            </tbody>
+        </table>
+    </section>
+}

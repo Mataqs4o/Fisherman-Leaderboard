@@ -1,0 +1,72 @@
+@model IEnumerable<Fisherman_Board.ViewModels.CarbonFootprintViewModel>
+@{
+    ViewData["Title"] = "Въглероден отпечатък";
+    var search = ViewData["Search"]?.ToString() ?? string.Empty;
+    var first = true;
+}
+
+<section class="page-header-card">
+    <div>
+        <span class="eyebrow">Справка 4</span>
+        <h1>Въглероден отпечатък на улова</h1>
+    </div>
+    <p>
+        Изчисление на разхода на гориво за 1 кг уловена риба, базирано на продължителността на излетите
+        и средния разход на двигателя. Корабите с изтекло разрешително не участват в класацията.
+    </p>
+</section>
+
+<section class="toolbar-card">
+    <form class="search-form" method="get">
+        <input type="search" name="search" value="@search" placeholder="Търсене по маркировка" />
+        <button type="submit" class="btn btn-primary-soft">Търси</button>
+        <a class="btn btn-ghost" asp-action="CarbonFootprint">Изчисти</a>
+    </form>
+    <a class="btn btn-ghost" asp-action="Index">Назад към справките</a>
+</section>
+
+@if (!Model.Any())
+{
+    <section class="content-card empty-state-card">
+        <h2>Няма резултати</h2>
+        <p>Няма достатъчно валидни данни за изчисляване на въглероден отпечатък.</p>
+    </section>
+}
+else
+{
+    <section class="table-card">
+        <table class="table table-app">
+            <thead>
+                <tr>
+                    <th>Кораб</th>
+                    <th>Общ улов</th>
+                    <th>Общо гориво</th>
+                    <th>Литра на 1 кг</th>
+                    <th>Статус</th>
+                </tr>
+            </thead>
+            <tbody>
+            @foreach (var item in Model)
+            {
+                <tr>
+                    <td>@item.VesselMarking</td>
+                    <td>@item.TotalCatchKg.ToString("F2") кг</td>
+                    <td>@item.TotalFuel.ToString("F2") л</td>
+                    <td>@item.CarbonPerKg.ToString("F2") л/кг</td>
+                    <td>
+                        @if (first)
+                        {
+                            <span class="table-pill table-pill-success">Най-ефективен</span>
+                            first = false;
+                        }
+                        else
+                        {
+                            <span class="table-pill">В класацията</span>
+                        }
+                    </td>
+                </tr>
+            }
+            </tbody>
+        </table>
+    </section>
+}

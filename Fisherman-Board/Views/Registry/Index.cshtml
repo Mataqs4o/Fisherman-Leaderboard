@@ -1,0 +1,61 @@
+@model Fisherman_Board.ViewModels.RegistryIndexViewModel
+@{
+    ViewData["Title"] = "Регистри";
+}
+
+<section class="page-header-card">
+    <div>
+        <span class="eyebrow">Задача 3</span>
+        <h1>Редакция на част от данните</h1>
+    </div>
+    <p>
+        Регистърната част позволява преглед, търсене, добавяне, редакция и изтриване
+        на трите основни таблици, които поиска: fisherman, лодки и улов.
+    </p>
+</section>
+
+@if (!Model.DatabaseAvailable)
+{
+    <section class="content-card empty-state-card">
+        <h2>Базата данни не е достъпна</h2>
+        <p>След като базата данни е налична, тук ще могат да се редактират записите в регистрите.</p>
+    </section>
+}
+else
+{
+    <section class="metrics-grid">
+        <article class="metric-card">
+            <span>Fisherman</span>
+            <strong>@Model.FishermenCount</strong>
+            <p>Записи за рибари.</p>
+        </article>
+        <article class="metric-card">
+            <span>Лодки</span>
+            <strong>@Model.BoatsCount</strong>
+            <p>Налични записи за лодки.</p>
+        </article>
+        <article class="metric-card">
+            <span>Улов</span>
+            <strong>@Model.CatchesCount</strong>
+            <p>Записи за улов в системата.</p>
+        </article>
+    </section>
+}
+
+<section class="card-grid">
+    <article class="content-card">
+        <h3>Fisherman</h3>
+        <p>Таблица с рибари, дата на раждане и помощни атрибути за билети и разрешителни.</p>
+        <a class="text-link" asp-action="Fishermen">Отвори таблицата</a>
+    </article>
+    <article class="content-card">
+        <h3>Лодки</h3>
+        <p>Таблица с лодки и техническите им характеристики за оперативни справки.</p>
+        <a class="text-link" asp-action="Boats">Отвори таблицата</a>
+    </article>
+    <article class="content-card">
+        <h3>Улов</h3>
+        <p>Таблица с улов по вид риба, количество и свързан излет.</p>
+        <a class="text-link" asp-action="Catches">Отвори таблицата</a>
+    </article>
+</section>

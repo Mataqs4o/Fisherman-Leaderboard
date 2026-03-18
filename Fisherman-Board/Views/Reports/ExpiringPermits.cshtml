@@ -1,0 +1,58 @@
+@model IEnumerable<Fisherman_Board.ViewModels.ExpiringPermitViewModel>
+@{
+    ViewData["Title"] = "Изтичащи разрешителни";
+    var search = ViewData["Search"]?.ToString() ?? string.Empty;
+    var today = DateTime.UtcNow.Date;
+}
+
+<section class="page-header-card">
+    <div>
+        <span class="eyebrow">Справка 1</span>
+        <h1>Кораби с изтичащи разрешителни</h1>
+    </div>
+    <p>Показва корабите, чиито разрешителни изтичат в рамките на следващите 30 дни.</p>
+</section>
+
+<section class="toolbar-card">
+    <form class="search-form" method="get">
+        <input type="search" name="search" value="@search" placeholder="Търсене по маркировка или международен номер" />
+        <button type="submit" class="btn btn-primary-soft">Търси</button>
+        <a class="btn btn-ghost" asp-action="ExpiringPermits">Изчисти</a>
+    </form>
+    <a class="btn btn-ghost" asp-action="Index">Назад към справките</a>
+</section>
+
+@if (!Model.Any())
+{
+    <section class="content-card empty-state-card">
+        <h2>Няма резултати</h2>
+        <p>Не са открити кораби с изтичащи разрешителни за зададения период.</p>
+    </section>
+}
+else
+{
+    <section class="table-card">
+        <table class="table table-app">
+            <thead>
+                <tr>
+                    <th>Маркировка</th>
+                    <th>Международен номер</th>
+                    <th>Валидно до</th>
+                    <th>Оставащи дни</th>
+                </tr>
+            </thead>
+            <tbody>
+            @foreach (var item in Model)
+            {
+                var daysLeft = Math.Max(0, (item.ValidTo.Date - today).Days);
+                <tr>
+                    <td>@item.VesselMarking</td>
+                    <td>@item.InternationalNumber</td>
+                    <td>@item.ValidTo.ToString("dd.MM.yyyy")</td>
+                    <td><span class="table-pill">@daysLeft дни</span></td>
+                </tr>
+            }
+            </tbody>
+        </table>
+    </section>
+}

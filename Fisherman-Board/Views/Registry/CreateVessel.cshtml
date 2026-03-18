@@ -1,0 +1,73 @@
+@model Fisherman_Board.Models.FishingVessel
+@using Microsoft.AspNetCore.Mvc.Rendering
+@{
+    ViewData["Title"] = "Добавяне на лодка";
+    var engines = ViewBag.EngineOptions as SelectList;
+}
+
+<section class="page-header-card">
+    <div>
+        <span class="eyebrow">Нов запис</span>
+        <h1>Добавяне на лодка</h1>
+    </div>
+    <p>Въведете идентификацията и техническите параметри на нова лодка.</p>
+</section>
+
+<section class="form-card">
+    <form method="post">
+        <div asp-validation-summary="ModelOnly" class="validation-summary"></div>
+        <div class="form-grid">
+            <div class="form-field">
+                <label asp-for="Marking"></label>
+                <input asp-for="Marking" class="form-control" />
+                <span asp-validation-for="Marking" class="text-danger"></span>
+            </div>
+            <div class="form-field">
+                <label asp-for="InternationalNumber"></label>
+                <input asp-for="InternationalNumber" class="form-control" />
+                <span asp-validation-for="InternationalNumber" class="text-danger"></span>
+            </div>
+            <div class="form-field">
+                <label asp-for="CallSign"></label>
+                <input asp-for="CallSign" class="form-control" />
+                <span asp-validation-for="CallSign" class="text-danger"></span>
+            </div>
+            <div class="form-field">
+                <label asp-for="EngineId"></label>
+                <select asp-for="EngineId" asp-items="engines" class="form-select">
+                    <option value="">Изберете двигател</option>
+                </select>
+                <span asp-validation-for="EngineId" class="text-danger"></span>
+            </div>
+            <div class="form-field">
+                <label asp-for="Length"></label>
+                <input asp-for="Length" class="form-control" />
+                <span asp-validation-for="Length" class="text-danger"></span>
+            </div>
+            <div class="form-field">
+                <label asp-for="Width"></label>
+                <input asp-for="Width" class="form-control" />
+                <span asp-validation-for="Width" class="text-danger"></span>
+            </div>
+            <div class="form-field">
+                <label asp-for="Tonnage"></label>
+                <input asp-for="Tonnage" class="form-control" />
+                <span asp-validation-for="Tonnage" class="text-danger"></span>
+            </div>
+            <div class="form-field">
+                <label asp-for="Draft"></label>
+                <input asp-for="Draft" class="form-control" />
+                <span asp-validation-for="Draft" class="text-danger"></span>
+            </div>
+        </div>
+
+        <div class="form-actions">
+            <button type="submit" class="btn btn-primary-soft">Запази</button>
+            <a class="btn btn-ghost" asp-action="Boats">Отказ</a>
+        </div>
+    </form>
+</section>
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+}

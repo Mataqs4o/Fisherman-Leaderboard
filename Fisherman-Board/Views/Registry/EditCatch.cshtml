@@ -1,0 +1,49 @@
+@model Fisherman_Board.Models.CatchRecord
+@using Microsoft.AspNetCore.Mvc.Rendering
+@{
+    ViewData["Title"] = "Редакция на улов";
+    var trips = ViewBag.TripOptions as SelectList;
+}
+
+<section class="page-header-card">
+    <div>
+        <span class="eyebrow">Редакция</span>
+        <h1>Редакция на улов</h1>
+    </div>
+    <p>Коригирайте записа за улов и запазете промените.</p>
+</section>
+
+<section class="form-card">
+    <form method="post">
+        <input asp-for="Id" type="hidden" />
+        <div asp-validation-summary="ModelOnly" class="validation-summary"></div>
+        <div class="form-grid">
+            <div class="form-field">
+                <label asp-for="Species"></label>
+                <input asp-for="Species" class="form-control" />
+                <span asp-validation-for="Species" class="text-danger"></span>
+            </div>
+            <div class="form-field">
+                <label asp-for="QuantityKg"></label>
+                <input asp-for="QuantityKg" class="form-control" />
+                <span asp-validation-for="QuantityKg" class="text-danger"></span>
+            </div>
+            <div class="form-field">
+                <label asp-for="FishingTripId"></label>
+                <select asp-for="FishingTripId" asp-items="trips" class="form-select">
+                    <option value="">Изберете излет</option>
+                </select>
+                <span asp-validation-for="FishingTripId" class="text-danger"></span>
+            </div>
+        </div>
+
+        <div class="form-actions">
+            <button type="submit" class="btn btn-primary-soft">Запази промените</button>
+            <a class="btn btn-ghost" asp-action="Catches">Отказ</a>
+        </div>
+    </form>
+</section>
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+}
