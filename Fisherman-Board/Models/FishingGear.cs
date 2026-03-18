@@ -1,14 +1,12 @@
-﻿namespace Fisherman_Board.Models
+namespace Fisherman_Board.Models;
 
+public class FishingGear
 {
-    public class FishingGear
-    {
-        public int Id { get; set; }
+    public int Id { get; set; }
 
-        public string Name { get; set; }        // мрежа, трал и т.н.
-        public string Description { get; set; }
+    public string Name { get; set; } = string.Empty;
+    public string Description { get; set; } = string.Empty;
 
-        public int FishingPermitId { get; set; }
-        public FishingPermit FishingPermit { get; set; }
-    }
+    public int FishingPermitId { get; set; }
+    public FishingPermit FishingPermit { get; set; } = null!;
 }

@@ -1,14 +1,12 @@
-﻿namespace Fisherman_Board.Models
+namespace Fisherman_Board.Models;
 
+public class VesselOwner
 {
-    public class VesselOwner
-    {
-        public int FishingVesselId { get; set; }
-        public FishingVessel FishingVessel { get; set; }
+    public int FishingVesselId { get; set; }
+    public FishingVessel FishingVessel { get; set; } = null!;
 
-        public int PersonId { get; set; }
-        public Person Person { get; set; }
+    public int PersonId { get; set; }
+    public Person Person { get; set; } = null!;
 
-        public bool IsCurrent { get; set; }
-    }
+    public bool IsCurrent { get; set; }
 }
