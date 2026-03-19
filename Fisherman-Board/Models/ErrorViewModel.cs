@@ -1,4 +1,5 @@
 namespace Fisherman_Board.Models
+
 {
     public class ErrorViewModel
     {

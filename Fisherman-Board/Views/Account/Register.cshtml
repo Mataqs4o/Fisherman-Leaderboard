@@ -1,0 +1,71 @@
+@model Fisherman_Board.ViewModels.RegisterViewModel
+@{
+    ViewData["Title"] = "Register";
+}
+
+<section class="auth-stage">
+    <div class="auth-story">
+        <span class="eyebrow">Fisherman</span>
+        <h1>Create your workspace access.</h1>
+        <p>
+            Registration is designed to be short and clear, so new operators can get into the system immediately.
+        </p>
+
+        <div class="auth-highlights">
+            <article class="auth-highlight-card">
+                <strong>Fast onboarding</strong>
+                <span>Just the essentials needed to create a secure account.</span>
+            </article>
+            <article class="auth-highlight-card">
+                <strong>Consistent flow</strong>
+                <span>The same visual language as the dashboard and registry screens.</span>
+            </article>
+            <article class="auth-highlight-card">
+                <strong>Ready to work</strong>
+                <span>Land directly in Fisherman after registration.</span>
+            </article>
+        </div>
+    </div>
+
+    <div class="auth-card">
+        <div class="auth-card-head">
+            <span class="auth-kicker">New account</span>
+            <h2>Join Fisherman</h2>
+            <p>Create your account with a work email and secure password.</p>
+        </div>
+
+        <form method="post" class="auth-form">
+            <input asp-for="ReturnUrl" type="hidden" />
+            <div asp-validation-summary="ModelOnly" class="validation-summary"></div>
+
+            <div class="auth-field">
+                <label asp-for="Email"></label>
+                <input asp-for="Email" class="form-control auth-input" autocomplete="email" />
+                <span asp-validation-for="Email" class="text-danger"></span>
+            </div>
+
+            <div class="auth-field">
+                <label asp-for="Password"></label>
+                <input asp-for="Password" class="form-control auth-input" autocomplete="new-password" />
+                <span asp-validation-for="Password" class="text-danger"></span>
+            </div>
+
+            <div class="auth-field">
+                <label asp-for="ConfirmPassword"></label>
+                <input asp-for="ConfirmPassword" class="form-control auth-input" autocomplete="new-password" />
+                <span asp-validation-for="ConfirmPassword" class="text-danger"></span>
+            </div>
+
+            <button type="submit" class="btn btn-auth-primary">Create account</button>
+        </form>
+
+        <div class="auth-meta">
+            <span>Already have access?</span>
+            <a asp-action="Login">Log in instead</a>
+        </div>
+    </div>
+</section>
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+}

@@ -1,0 +1,62 @@
+@model IEnumerable<Fisherman_Board.ViewModels.VesselStatsViewModel>
+@{
+    ViewData["Title"] = "Статистика за кораби";
+    var search = ViewData["Search"]?.ToString() ?? string.Empty;
+}
+
+<section class="page-header-card">
+    <div>
+        <span class="eyebrow">Справка 3</span>
+        <h1>Годишна статистика за риболовни кораби</h1>
+    </div>
+    <p>Обобщава продължителност, брой излети и количество улов по кораб за текущата година.</p>
+</section>
+
+<section class="toolbar-card">
+    <form class="search-form" method="get">
+        <input type="search" name="search" value="@search" placeholder="Търсене по маркировка" />
+        <button type="submit" class="btn btn-primary-soft">Търси</button>
+        <a class="btn btn-ghost" asp-action="VesselStats">Изчисти</a>
+    </form>
+    <a class="btn btn-ghost" asp-action="Index">Назад към справките</a>
+</section>
+
+@if (!Model.Any())
+{
+    <section class="content-card empty-state-card">
+        <h2>Няма резултати</h2>
+        <p>Няма намерени кораби с излети за текущата година.</p>
+    </section>
+}
+else
+{
+    <section class="table-card">
+        <table class="table table-app">
+            <thead>
+                <tr>
+                    <th>Кораб</th>
+                    <th>Излети</th>
+                    <th>Общ улов</th>
+                    <th>Средна продължителност</th>
+                    <th>Мин/Макс продължителност</th>
+                    <th>Среден улов на излет</th>
+                    <th>Мин/Макс улов</th>
+                </tr>
+            </thead>
+            <tbody>
+            @foreach (var item in Model)
+            {
+                <tr>
+                    <td>@item.VesselMarking</td>
+                    <td>@item.TripsCount</td>
+                    <td>@item.TotalCatchKg.ToString("F2") кг</td>
+                    <td>@item.AvgTripDurationHours.ToString("F2") ч.</td>
+                    <td>@item.MinTripDurationHours.ToString("F2") / @item.MaxTripDurationHours.ToString("F2") ч.</td>
+                    <td>@item.AvgCatchPerTrip.ToString("F2") кг</td>
+                    <td>@item.MinCatchPerTrip.ToString("F2") / @item.MaxCatchPerTrip.ToString("F2") кг</td>
+                </tr>
+            }
+            </tbody>
+        </table>
+    </section>
+}

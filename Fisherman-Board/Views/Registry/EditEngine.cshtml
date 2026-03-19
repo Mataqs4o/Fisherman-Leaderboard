@@ -1,0 +1,50 @@
+@model Fisherman_Board.Models.Engine
+@{
+    ViewData["Title"] = "Редакция на двигател";
+}
+
+<section class="page-header-card">
+    <div>
+        <span class="eyebrow">Редакция</span>
+        <h1>Обновяване на двигател</h1>
+    </div>
+    <p>Коригирайте техническите параметри и запазете промените.</p>
+</section>
+
+<section class="form-card">
+    <form method="post">
+        <input asp-for="Id" type="hidden" />
+        <div asp-validation-summary="ModelOnly" class="validation-summary"></div>
+        <div class="form-grid">
+            <div class="form-field">
+                <label asp-for="Type"></label>
+                <input asp-for="Type" class="form-control" />
+                <span asp-validation-for="Type" class="text-danger"></span>
+            </div>
+            <div class="form-field">
+                <label asp-for="FuelType"></label>
+                <input asp-for="FuelType" class="form-control" />
+                <span asp-validation-for="FuelType" class="text-danger"></span>
+            </div>
+            <div class="form-field">
+                <label asp-for="PowerKw"></label>
+                <input asp-for="PowerKw" class="form-control" />
+                <span asp-validation-for="PowerKw" class="text-danger"></span>
+            </div>
+            <div class="form-field">
+                <label asp-for="AvgFuelPerHour"></label>
+                <input asp-for="AvgFuelPerHour" class="form-control" />
+                <span asp-validation-for="AvgFuelPerHour" class="text-danger"></span>
+            </div>
+        </div>
+
+        <div class="form-actions">
+            <button type="submit" class="btn btn-primary-soft">Запази промените</button>
+            <a class="btn btn-ghost" asp-action="Engines">Отказ</a>
+        </div>
+    </form>
+</section>
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+}

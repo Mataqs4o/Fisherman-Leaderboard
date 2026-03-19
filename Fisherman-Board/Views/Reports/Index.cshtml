@@ -1,0 +1,76 @@
+@model Fisherman_Board.ViewModels.ReportsIndexViewModel
+@{
+    ViewData["Title"] = "Справки";
+}
+
+<section class="page-header-card">
+    <div>
+        <span class="eyebrow">Задача 2</span>
+        <h1>Аналитични справки за ИАРА</h1>
+    </div>
+    <p>
+        Четирите изгледа покриват изискваните класации и оперативни списъци:
+        изтичащи разрешителни, топ любители, статистика за кораби и въглероден отпечатък.
+    </p>
+</section>
+
+@if (!Model.DatabaseAvailable)
+{
+    <section class="content-card empty-state-card">
+        <h2>Няма връзка с базата данни</h2>
+        <p>След свързване с базата данни тук ще се заредят всички справки и обобщения.</p>
+    </section>
+}
+else
+{
+    <section class="metrics-grid report-metrics">
+        <article class="metric-card">
+            <span>Изтичащи разрешителни</span>
+            <strong>@Model.ExpiringPermitCount</strong>
+            <p>Кораби с валидност до 30 дни.</p>
+        </article>
+        <article class="metric-card">
+            <span>Рибари любители</span>
+            <strong>@Model.RecreationalRankingCount</strong>
+            <p>Участници в годишната класация.</p>
+        </article>
+        <article class="metric-card">
+            <span>Кораби в статистиката</span>
+            <strong>@Model.VesselStatsCount</strong>
+            <p>С излети през текущата година.</p>
+        </article>
+        <article class="metric-card">
+            <span>Карбон класация</span>
+            <strong>@Model.CarbonRankingCount</strong>
+            <p>Кораби с валидни разрешителни и улов.</p>
+        </article>
+    </section>
+
+    <section class="content-card note-card">
+        <strong>@Model.RecreationalLeaderSummary</strong>
+        <span>@Model.CarbonLeaderSummary</span>
+    </section>
+}
+
+<section class="card-grid">
+    <article class="content-card">
+        <h3>Справка 1</h3>
+        <p>Списък на корабите с изтичащо разрешително през следващия месец.</p>
+        <a class="text-link" asp-action="ExpiringPermits">Отвори справката</a>
+    </article>
+    <article class="content-card">
+        <h3>Справка 2</h3>
+        <p>Класация на рибарите любители по улов за последната една година.</p>
+        <a class="text-link" asp-action="TopRecreational">Отвори справката</a>
+    </article>
+    <article class="content-card">
+        <h3>Справка 3</h3>
+        <p>Средна, минимална и максимална статистика за излетите и улова на корабите.</p>
+        <a class="text-link" asp-action="VesselStats">Отвори справката</a>
+    </article>
+    <article class="content-card">
+        <h3>Справка 4</h3>
+        <p>Изчисление на изразходваното гориво на 1 кг уловена риба.</p>
+        <a class="text-link" asp-action="CarbonFootprint">Отвори справката</a>
+    </article>
+</section>

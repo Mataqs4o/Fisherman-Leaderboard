@@ -1,4 +1,14 @@
-﻿// Please see documentation at https://learn.microsoft.com/aspnet/core/client-side/bundling-and-minification
-// for details on configuring this project to bundle and minify static web assets.
+document.addEventListener("DOMContentLoaded", () => {
+  const statusBanner = document.querySelector(".status-banner");
 
-// Write your JavaScript code.
+  if (!statusBanner) {
+    return;
+  }
+
+  window.setTimeout(() => {
+    statusBanner.style.transition = "opacity 0.3s ease, transform 0.3s ease";
+    statusBanner.style.opacity = "0";
+    statusBanner.style.transform = "translateY(-6px)";
+    window.setTimeout(() => statusBanner.remove(), 320);
+  }, 4200);
+});

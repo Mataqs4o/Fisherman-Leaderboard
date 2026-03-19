@@ -1,48 +1,97 @@
-﻿<!DOCTYPE html>
-<html lang="en">
+@{
+    var currentController = ViewContext.RouteData.Values["controller"]?.ToString();
+    var currentAction = ViewContext.RouteData.Values["action"]?.ToString();
+    var statusMessage = TempData["StatusMessage"]?.ToString();
+    var statusType = TempData["StatusType"]?.ToString() ?? "success";
+    var isAuthPage = string.Equals(currentController, "Account", StringComparison.OrdinalIgnoreCase) &&
+                     (string.Equals(currentAction, "Login", StringComparison.OrdinalIgnoreCase) ||
+                      string.Equals(currentAction, "Register", StringComparison.OrdinalIgnoreCase));
+
+    string NavClass(string controller) =>
+        string.Equals(currentController, controller, StringComparison.OrdinalIgnoreCase)
+            ? "nav-link is-active"
+            : "nav-link";
+}
+<!DOCTYPE html>
+<html lang="bg">
 <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>@ViewData["Title"] - Fisherman_Board</title>
-    <script type="importmap"></script>
+    <title>@(string.IsNullOrWhiteSpace(ViewData["Title"]?.ToString()) ? "Fisherman" : $"{ViewData["Title"]} | Fisherman")</title>
     <link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.min.css" />
     <link rel="stylesheet" href="~/css/site.css" asp-append-version="true" />
     <link rel="stylesheet" href="~/Fisherman_Board.styles.css" asp-append-version="true" />
 </head>
-<body>
-    <header>
-        <nav class="navbar navbar-expand-sm navbar-toggleable-sm navbar-light bg-white border-bottom box-shadow mb-3">
-            <div class="container-fluid">
-                <a class="navbar-brand" asp-area="" asp-controller="Home" asp-action="Index">Fisherman_Board</a>
-                <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target=".navbar-collapse" aria-controls="navbarSupportedContent"
-                        aria-expanded="false" aria-label="Toggle navigation">
-                    <span class="navbar-toggler-icon"></span>
-                </button>
-                <div class="navbar-collapse collapse d-sm-inline-flex justify-content-between">
-                    <ul class="navbar-nav flex-grow-1">
-                        <li class="nav-item">
-                            <a class="nav-link text-dark" asp-area="" asp-controller="Home" asp-action="Index">Home</a>
-                        </li>
-                        <li class="nav-item">
-                            <a class="nav-link text-dark" asp-area="" asp-controller="Home" asp-action="Privacy">Privacy</a>
-                        </li>
-                    </ul>
-                    <partial name="_LoginPartial" />
-                </div>
+<body class="app-body @(isAuthPage ? "auth-page" : string.Empty)">
+    <div class="app-bg"></div>
+
+    <header class="site-header">
+        <nav class="navbar navbar-expand-lg navbar-dark">
+            <div class="container-xl">
+                <a class="navbar-brand brand-lockup" asp-controller="Home" asp-action="Index">
+                    <span class="brand-mark">F</span>
+                    <span class="brand-text">
+                        <strong>Fisherman</strong>
+                    </span>
+                </a>
+
+                @if (isAuthPage)
+                {
+                    <div class="auth-header-actions">
+                        <a class="btn btn-ghost" asp-controller="Home" asp-action="Index">Home</a>
+                    </div>
+                }
+                else
+                {
+                    <button class="navbar-toggler border-0 shadow-none" type="button" data-bs-toggle="collapse" data-bs-target="#mainNavigation" aria-controls="mainNavigation" aria-expanded="false" aria-label="Превключване на навигацията">
+                        <span class="navbar-toggler-icon"></span>
+                    </button>
+
+                    <div class="collapse navbar-collapse" id="mainNavigation">
+                        <ul class="navbar-nav ms-auto align-items-lg-center gap-lg-2">
+                            <li class="nav-item">
+                                <a class="@NavClass("Home")" asp-controller="Home" asp-action="Index">Dashboard</a>
+                            </li>
+                            <li class="nav-item">
+                                <a class="@NavClass("Reports")" asp-controller="Reports" asp-action="Index">Reports</a>
+                            </li>
+                            <li class="nav-item">
+                                <a class="@NavClass("Registry")" asp-controller="Registry" asp-action="Index">Registry</a>
+                            </li>
+                        </ul>
+
+                        <div class="nav-identity-wrap">
+                            <partial name="_LoginPartial" />
+                        </div>
+                    </div>
+                }
             </div>
         </nav>
     </header>
-    <div class="container">
-        <main role="main" class="pb-3">
-            @RenderBody()
-        </main>
-    </div>
 
-    <footer class="border-top footer text-muted">
-        <div class="container">
-            &copy; 2026 - Fisherman_Board - <a asp-area="" asp-controller="Home" asp-action="Privacy">Privacy</a>
+    <main class="page-shell">
+        <div class="container-xl">
+            @if (!string.IsNullOrWhiteSpace(statusMessage))
+            {
+                <div class="status-banner status-@statusType" role="status">
+                    <span>@statusMessage</span>
+                </div>
+            }
+
+            @RenderBody()
+        </div>
+    </main>
+
+    <footer class="site-footer">
+        <div class="container-xl footer-content">
+            <div>
+                <strong>Fisherman</strong>
+                <p>Operational workspace for boats, catches and reporting.</p>
+            </div>
+            <a asp-controller="Home" asp-action="Privacy">За проекта</a>
         </div>
     </footer>
+
     <script src="~/lib/jquery/dist/jquery.min.js"></script>
     <script src="~/lib/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
     <script src="~/js/site.js" asp-append-version="true"></script>

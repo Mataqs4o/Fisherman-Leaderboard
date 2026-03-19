@@ -1,0 +1,48 @@
+@model Fisherman_Board.Models.Person
+@{
+    ViewData["Title"] = "Добавяне на fisherman";
+}
+
+<section class="page-header-card">
+    <div>
+        <span class="eyebrow">Нов запис</span>
+        <h1>Добавяне на fisherman</h1>
+    </div>
+    <p>Попълнете основните данни за рибаря.</p>
+</section>
+
+<section class="form-card">
+    <form method="post">
+        <div asp-validation-summary="ModelOnly" class="validation-summary"></div>
+        <div class="form-grid">
+            <div class="form-field">
+                <label asp-for="FullName"></label>
+                <input asp-for="FullName" class="form-control" />
+                <span asp-validation-for="FullName" class="text-danger"></span>
+            </div>
+            <div class="form-field">
+                <label asp-for="BirthDate"></label>
+                <input asp-for="BirthDate" class="form-control" type="date" />
+                <span asp-validation-for="BirthDate" class="text-danger"></span>
+            </div>
+            <div class="form-field">
+                <label asp-for="TelkNumber"></label>
+                <input asp-for="TelkNumber" class="form-control" />
+                <span asp-validation-for="TelkNumber" class="text-danger"></span>
+            </div>
+            <div class="form-field checkbox-field">
+                <label class="checkbox-wrap"><input asp-for="IsPensioner" /> <span>Пенсионер</span></label>
+                <label class="checkbox-wrap"><input asp-for="IsDisabled" /> <span>С увреждане</span></label>
+            </div>
+        </div>
+
+        <div class="form-actions">
+            <button type="submit" class="btn btn-primary-soft">Запази</button>
+            <a class="btn btn-ghost" asp-action="Fishermen">Отказ</a>
+        </div>
+    </form>
+</section>
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+}
