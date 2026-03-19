@@ -1,35 +1,163 @@
-@model Fisherman_Board.Models.CaseBriefViewModel
+@model Fisherman_Board.Models.DashboardViewModel
 
 @{
-    ViewData["Title"] = Model.PageTitle;
+    ViewData["Title"] = "Fisherman Board";
 }
 
-<article class="academic-case">
-    <header class="academic-case__header">
-        <p class="academic-case__eyebrow">@Model.Eyebrow</p>
-        <h1>@Model.Heading</h1>
-        <p class="academic-case__subtitle">@Model.Subtitle</p>
-    </header>
-
-    @foreach (var caseSection in Model.Sections)
-    {
-        <div class="academic-case__section">
-            <h2>@caseSection.Title</h2>
-
-            @foreach (var paragraph in caseSection.Paragraphs)
-            {
-                <p>@Html.Raw(paragraph)</p>
-            }
-
-            @if (caseSection.BulletPoints.Count > 0)
-            {
-                <ul>
-                    @foreach (var bulletPoint in caseSection.BulletPoints)
-                    {
-                        <li>@bulletPoint</li>
-                    }
-                </ul>
-            }
+<section class="board-hero">
+    <div>
+        <p class="board-hero__eyebrow">IARA case implementation</p>
+        <h1>Fishing registry with its own database</h1>
+        <p class="board-hero__copy">
+            This is a school project to make a board about fisherman who want to be able to track their data using the database created for it.
+        </p>
+        <footer>
+            Made by Matias,Nikola,Stanislav.
+        </footer>
+    </div>
+    <div class="board-hero__stats">
+        <div>
+            <span>@Model.Fishermen.Count</span>
+            <small>Fishermen</small>
         </div>
-    }
-</article>
+        <div>
+            <span>@Model.Boats.Count</span>
+            <small>Boats</small>
+        </div>
+        <div>
+            <span>@Model.Hunts.Count</span>
+            <small>Hunts</small>
+        </div>
+    </div>
+</section>
+
+<section class="registry-section" id="fisherman">
+    <div class="registry-section__header">
+        <h2>Fisherman</h2>
+        <p>Registered people who own boats and perform hunts.</p>
+    </div>
+    <div class="table-responsive">
+        <table class="table table-striped table-bordered align-middle">
+            <thead>
+                <tr>
+                    <th>Id</th>
+                    <th>Full Name</th>
+                    <th>License</th>
+                    <th>Home Port</th>
+                    <th>Phone</th>
+                </tr>
+            </thead>
+            <tbody>
+                @if (Model.Fishermen.Count == 0)
+                {
+                    <tr>
+                        <td colspan="5" class="text-center">No fisherman records yet.</td>
+                    </tr>
+                }
+                else
+                {
+                    @foreach (var fisherman in Model.Fishermen)
+                    {
+                        <tr>
+                            <td>@fisherman.Id</td>
+                            <td>@fisherman.FullName</td>
+                            <td>@fisherman.LicenseNumber</td>
+                            <td>@fisherman.HomePort</td>
+                            <td>@fisherman.PhoneNumber</td>
+                        </tr>
+                    }
+                }
+            </tbody>
+        </table>
+    </div>
+</section>
+
+<section class="registry-section" id="boats">
+    <div class="registry-section__header">
+        <h2>Boats</h2>
+        <p>Each boat is linked to one fisherman and stores the main technical details from the case.</p>
+    </div>
+    <div class="table-responsive">
+        <table class="table table-striped table-bordered align-middle">
+            <thead>
+                <tr>
+                    <th>Id</th>
+                    <th>Name</th>
+                    <th>Registration</th>
+                    <th>Length (m)</th>
+                    <th>Engine</th>
+                    <th>Owner</th>
+                </tr>
+            </thead>
+            <tbody>
+                @if (Model.Boats.Count == 0)
+                {
+                    <tr>
+                        <td colspan="6" class="text-center">No boat records yet.</td>
+                    </tr>
+                }
+                else
+                {
+                    @foreach (var boat in Model.Boats)
+                    {
+                        <tr>
+                            <td>@boat.Id</td>
+                            <td>@boat.Name</td>
+                            <td>@boat.RegistrationNumber</td>
+                            <td>@boat.LengthMeters.ToString("0.00")</td>
+                            <td>@boat.EngineModel</td>
+                            <td>@boat.Fisherman.FullName</td>
+                        </tr>
+                    }
+                }
+            </tbody>
+        </table>
+    </div>
+</section>
+
+<section class="registry-section" id="hunt">
+    <div class="registry-section__header">
+        <h2>Hunt</h2>
+        <p>Each hunt connects a fisherman, a boat, and the recorded catch information.</p>
+    </div>
+    <div class="table-responsive">
+        <table class="table table-striped table-bordered align-middle">
+            <thead>
+                <tr>
+                    <th>Id</th>
+                    <th>Started</th>
+                    <th>Ended</th>
+                    <th>Fish Type</th>
+                    <th>Quantity (kg)</th>
+                    <th>Area</th>
+                    <th>Fisherman</th>
+                    <th>Boat</th>
+                </tr>
+            </thead>
+            <tbody>
+                @if (Model.Hunts.Count == 0)
+                {
+                    <tr>
+                        <td colspan="8" class="text-center">No hunt records yet.</td>
+                    </tr>
+                }
+                else
+                {
+                    @foreach (var hunt in Model.Hunts)
+                    {
+                        <tr>
+                            <td>@hunt.Id</td>
+                            <td>@hunt.StartedAt.ToString("dd.MM.yyyy HH:mm")</td>
+                            <td>@hunt.EndedAt.ToString("dd.MM.yyyy HH:mm")</td>
+                            <td>@hunt.FishType</td>
+                            <td>@hunt.QuantityKg.ToString("0.00")</td>
+                            <td>@hunt.FishingArea</td>
+                            <td>@hunt.Fisherman.FullName</td>
+                            <td>@hunt.Boat.Name</td>
+                        </tr>
+                    }
+                }
+            </tbody>
+        </table>
+    </div>
+</section>
