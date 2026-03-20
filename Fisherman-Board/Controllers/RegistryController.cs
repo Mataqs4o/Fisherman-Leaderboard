@@ -246,7 +246,7 @@ public class RegistryController : Controller
 
         if (!CanConnect())
         {
-            return View(Array.Empty<FishingVessel>());
+            return View("Vessels", Array.Empty<FishingVessel>());
         }
 
         var query = _context.FishingVessels
@@ -267,7 +267,7 @@ public class RegistryController : Controller
             .OrderBy(vessel => vessel.Marking)
             .ToListAsync();
 
-        return View(model);
+        return View("Vessels", model);
     }
 
     public Task<IActionResult> Boats(string? search) => Vessels(search);
@@ -275,10 +275,14 @@ public class RegistryController : Controller
     public async Task<IActionResult> CreateVessel()
     {
         await PopulateEngineOptionsAsync();
-        return View(new FishingVessel());
+        return View("CreateVessel", new FishingVessel());
     }
 
     public Task<IActionResult> CreateBoat() => CreateVessel();
+
+    [HttpPost]
+    [ValidateAntiForgeryToken]
+    public Task<IActionResult> CreateBoat(FishingVessel vessel) => CreateVessel(vessel);
 
     [HttpPost]
     [ValidateAntiForgeryToken]
@@ -287,7 +291,7 @@ public class RegistryController : Controller
         if (!ModelState.IsValid)
         {
             await PopulateEngineOptionsAsync(vessel.EngineId);
-            return View(vessel);
+            return View("CreateVessel", vessel);
         }
 
         _context.FishingVessels.Add(vessel);
@@ -306,10 +310,14 @@ public class RegistryController : Controller
         }
 
         await PopulateEngineOptionsAsync(vessel.EngineId);
-        return View(vessel);
+        return View("EditVessel", vessel);
     }
 
     public Task<IActionResult> EditBoat(int id) => EditVessel(id);
+
+    [HttpPost]
+    [ValidateAntiForgeryToken]
+    public Task<IActionResult> EditBoat(int id, FishingVessel vessel) => EditVessel(id, vessel);
 
     [HttpPost]
     [ValidateAntiForgeryToken]
@@ -323,7 +331,7 @@ public class RegistryController : Controller
         if (!ModelState.IsValid)
         {
             await PopulateEngineOptionsAsync(vessel.EngineId);
-            return View(vessel);
+            return View("EditVessel", vessel);
         }
 
         _context.Update(vessel);
