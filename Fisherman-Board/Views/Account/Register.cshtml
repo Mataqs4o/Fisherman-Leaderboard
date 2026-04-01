@@ -1,28 +1,32 @@
 @model Fisherman_Board.ViewModels.RegisterViewModel
 @{
-    ViewData["Title"] = "Register";
+    ViewData["Title"] = "Регистрация";
 }
 
-<section class="auth-stage">
+<section class="auth-stage" data-reveal="0">
     <div class="auth-story">
-        <span class="eyebrow">Fisherman</span>
-        <h1>Create your workspace access.</h1>
+        <span class="eyebrow">Fisherman onboarding</span>
+        <h1>Създай достъп до системата без излишни стъпки.</h1>
         <p>
-            Registration is designed to be short and clear, so new operators can get into the system immediately.
+            Регистрацията е кратка и ясна, за да може нов оператор да влезе в системата и да започне работа веднага.
         </p>
+
+        <div class="auth-illustration-shell" data-parallax>
+            <img class="auth-illustration" src="~/images/auth-beacon.svg" alt="Илюстрация за регистрация във Fisherman" />
+        </div>
 
         <div class="auth-highlights">
             <article class="auth-highlight-card">
-                <strong>Fast onboarding</strong>
-                <span>Just the essentials needed to create a secure account.</span>
+                <strong>Бързо включване</strong>
+                <span>Само необходимото за създаване на защитен профил.</span>
             </article>
             <article class="auth-highlight-card">
-                <strong>Consistent flow</strong>
-                <span>The same visual language as the dashboard and registry screens.</span>
+                <strong>Единен стил</strong>
+                <span>Същата визуална логика като таблото, справките и регистрите.</span>
             </article>
             <article class="auth-highlight-card">
-                <strong>Ready to work</strong>
-                <span>Land directly in Fisherman after registration.</span>
+                <strong>Готово за работа</strong>
+                <span>След регистрацията продължаваш директно към Fisherman.</span>
             </article>
         </div>
     </div>
@@ -30,8 +34,8 @@
     <div class="auth-card">
         <div class="auth-card-head">
             <span class="auth-kicker">New account</span>
-            <h2>Join Fisherman</h2>
-            <p>Create your account with a work email and secure password.</p>
+            <h2>Регистрация във Fisherman</h2>
+            <p>Създай профил с имейл и сигурна парола.</p>
         </div>
 
         <form method="post" class="auth-form">
@@ -56,12 +60,12 @@
                 <span asp-validation-for="ConfirmPassword" class="text-danger"></span>
             </div>
 
-            <button type="submit" class="btn btn-auth-primary">Create account</button>
+            <button type="submit" class="btn btn-auth-primary">Създай акаунт</button>
         </form>
 
         <div class="auth-meta">
-            <span>Already have access?</span>
-            <a asp-action="Login">Log in instead</a>
+            <span>Вече имаш достъп?</span>
+            <a asp-action="Login">Влез в профила си</a>
         </div>
     </div>
 </section>
