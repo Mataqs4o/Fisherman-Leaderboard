@@ -1584,3 +1584,157 @@ h4,
     transform: none;
   }
 }
+
+.field-heading {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.75rem;
+}
+
+.btn-inline {
+  padding: 0;
+  border: 0;
+  background: none;
+  color: #0f6982;
+  font-weight: 700;
+  font-size: 0.92rem;
+}
+
+.password-input-shell {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  gap: 0.75rem;
+  align-items: center;
+}
+
+.password-generator-btn {
+  min-height: 3.35rem;
+  padding: 0.8rem 1rem;
+  border: 1px solid rgba(16, 44, 60, 0.12);
+  border-radius: 18px;
+  background: rgba(255, 255, 255, 0.88);
+  color: #123245;
+  font-weight: 700;
+  transition: transform 0.18s ease, box-shadow 0.18s ease, border-color 0.18s ease;
+}
+
+.password-generator-btn:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 12px 24px rgba(9, 28, 39, 0.1);
+}
+
+.password-meter-card {
+  display: grid;
+  gap: 0.75rem;
+  padding: 1rem 1rem 0.95rem;
+  border: 1px solid rgba(16, 44, 60, 0.08);
+  border-radius: 20px;
+  background: linear-gradient(180deg, rgba(248, 251, 250, 0.95), rgba(242, 247, 245, 0.92));
+}
+
+.password-meter-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+  color: var(--muted);
+  font-size: 0.92rem;
+}
+
+.password-meter-row strong {
+  color: var(--ink);
+}
+
+.password-meter {
+  position: relative;
+  width: 100%;
+  height: 0.9rem;
+  padding: 0;
+  border: 0;
+  border-radius: 999px;
+  background: rgba(16, 44, 60, 0.08);
+  overflow: hidden;
+  cursor: pointer;
+}
+
+.password-meter-fill {
+  display: block;
+  height: 100%;
+  width: 0;
+  border-radius: inherit;
+  transition: width 0.2s ease, background-color 0.2s ease;
+}
+
+.password-meter.is-empty .password-meter-fill {
+  background: rgba(16, 44, 60, 0.1);
+}
+
+.password-meter.is-weak .password-meter-fill {
+  background: linear-gradient(90deg, #d14f4f, #ef7a67);
+}
+
+.password-meter.is-fair .password-meter-fill {
+  background: linear-gradient(90deg, #d67a2d, #efb153);
+}
+
+.password-meter.is-medium .password-meter-fill {
+  background: linear-gradient(90deg, #d9a33e, #efd06b);
+}
+
+.password-meter.is-good .password-meter-fill {
+  background: linear-gradient(90deg, #68b980, #6fc8a3);
+}
+
+.password-meter.is-strong .password-meter-fill {
+  background: linear-gradient(90deg, #3ba181, #64d3bc);
+}
+
+.password-help-popover {
+  display: grid;
+  gap: 0.55rem;
+  padding: 0.95rem 1rem;
+  border: 1px solid rgba(16, 44, 60, 0.08);
+  border-radius: 18px;
+  background: rgba(255, 255, 255, 0.94);
+  box-shadow: 0 16px 28px rgba(7, 24, 35, 0.08);
+}
+
+.password-help-popover[hidden] {
+  display: none;
+}
+
+.password-help-popover strong {
+  color: #153546;
+}
+
+.password-help-list {
+  margin: 0;
+  padding-left: 1.15rem;
+  color: var(--muted);
+}
+
+.password-help-list li + li {
+  margin-top: 0.4rem;
+}
+
+.password-status-note {
+  margin: 0;
+  color: var(--muted);
+  font-size: 0.92rem;
+  line-height: 1.6;
+}
+
+@media (max-width: 767.98px) {
+  .field-heading,
+  .password-meter-row,
+  .password-input-shell {
+    grid-template-columns: 1fr;
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .password-generator-btn {
+    width: 100%;
+  }
+}
