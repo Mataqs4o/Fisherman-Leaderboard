@@ -3,27 +3,38 @@
     ViewData["Title"] = "Справки";
 }
 
-<section class="page-header-card">
-    <div>
-        <span class="eyebrow">Задача 2</span>
-        <h1>Аналитични справки за ИАРА</h1>
+<section class="page-header-card split-header" data-reveal="0">
+    <div class="split-header-copy">
+        <span class="eyebrow">Аналитичен център</span>
+        <h1>Оперативни справки с по-ясна структура и бърза навигация.</h1>
+        <p>
+            Четирите изгледа покриват основните проверки и класации:
+            изтичащи разрешителни, топ любители, статистика за кораби и въглероден отпечатък.
+        </p>
     </div>
-    <p>
-        Четирите изгледа покриват изискваните класации и оперативни списъци:
-        изтичащи разрешителни, топ любители, статистика за кораби и въглероден отпечатък.
-    </p>
+
+    <aside class="split-header-aside">
+        <div class="stat-orb">
+            <span>4</span>
+            <small>готови справки</small>
+        </div>
+        <div class="mini-panel">
+            <span class="mini-label">Навигация</span>
+            <strong>Отваряш справката директно от картата и стигаш по-бързо до ключовите данни.</strong>
+        </div>
+    </aside>
 </section>
 
 @if (!Model.DatabaseAvailable)
 {
-    <section class="content-card empty-state-card">
+    <section class="content-card empty-state-card" data-reveal="1">
         <h2>Няма връзка с базата данни</h2>
         <p>След свързване с базата данни тук ще се заредят всички справки и обобщения.</p>
     </section>
 }
 else
 {
-    <section class="metrics-grid report-metrics">
+    <section class="metrics-grid report-metrics" data-reveal="1">
         <article class="metric-card">
             <span>Изтичащи разрешителни</span>
             <strong>@Model.ExpiringPermitCount</strong>
@@ -46,31 +57,47 @@ else
         </article>
     </section>
 
-    <section class="content-card note-card">
+    <section class="content-card note-card" data-reveal="2">
         <strong>@Model.RecreationalLeaderSummary</strong>
         <span>@Model.CarbonLeaderSummary</span>
     </section>
 }
 
-<section class="card-grid">
-    <article class="content-card">
+<section class="card-grid" data-reveal="3">
+    <article class="content-card feature-card">
+        <span class="card-kicker">Справка 1</span>
         <h3>Справка 1</h3>
         <p>Списък на корабите с изтичащо разрешително през следващия месец.</p>
-        <a class="text-link" asp-action="ExpiringPermits">Отвори справката</a>
+        <div class="feature-meta">
+            <a class="text-link" asp-action="ExpiringPermits">Отвори справката</a>
+            <span>Контрол на срокове</span>
+        </div>
     </article>
-    <article class="content-card">
+    <article class="content-card feature-card">
+        <span class="card-kicker">Справка 2</span>
         <h3>Справка 2</h3>
         <p>Класация на рибарите любители по улов за последната една година.</p>
-        <a class="text-link" asp-action="TopRecreational">Отвори справката</a>
+        <div class="feature-meta">
+            <a class="text-link" asp-action="TopRecreational">Отвори справката</a>
+            <span>Годишна класация</span>
+        </div>
     </article>
-    <article class="content-card">
+    <article class="content-card feature-card">
+        <span class="card-kicker">Справка 3</span>
         <h3>Справка 3</h3>
         <p>Средна, минимална и максимална статистика за излетите и улова на корабите.</p>
-        <a class="text-link" asp-action="VesselStats">Отвори справката</a>
+        <div class="feature-meta">
+            <a class="text-link" asp-action="VesselStats">Отвори справката</a>
+            <span>Статистика по кораб</span>
+        </div>
     </article>
-    <article class="content-card">
+    <article class="content-card feature-card">
+        <span class="card-kicker">Справка 4</span>
         <h3>Справка 4</h3>
         <p>Изчисление на изразходваното гориво на 1 кг уловена риба.</p>
-        <a class="text-link" asp-action="CarbonFootprint">Отвори справката</a>
+        <div class="feature-meta">
+            <a class="text-link" asp-action="CarbonFootprint">Отвори справката</a>
+            <span>Ефективност и разход</span>
+        </div>
     </article>
 </section>

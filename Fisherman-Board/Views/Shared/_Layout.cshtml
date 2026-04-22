@@ -24,21 +24,30 @@
 </head>
 <body class="app-body @(isAuthPage ? "auth-page" : string.Empty)">
     <div class="app-bg"></div>
+    <div class="app-grid"></div>
 
     <header class="site-header">
+        <div class="container-xl topbar">
+            <span class="topbar-pill">Fisherman workspace</span>
+            <span class="topbar-copy">Професионална среда за регистри, улов и оперативни справки</span>
+        </div>
+
         <nav class="navbar navbar-expand-lg navbar-dark">
             <div class="container-xl">
                 <a class="navbar-brand brand-lockup" asp-controller="Home" asp-action="Index">
-                    <span class="brand-mark">F</span>
+                    <span class="brand-mark">
+                        <span class="brand-mark-core"></span>
+                    </span>
                     <span class="brand-text">
                         <strong>Fisherman</strong>
+                        <small>Maritime operations desk</small>
                     </span>
                 </a>
 
                 @if (isAuthPage)
                 {
                     <div class="auth-header-actions">
-                        <a class="btn btn-ghost" asp-controller="Home" asp-action="Index">Home</a>
+                        <a class="btn btn-ghost" asp-controller="Home" asp-action="Index">Начало</a>
                     </div>
                 }
                 else
@@ -50,13 +59,13 @@
                     <div class="collapse navbar-collapse" id="mainNavigation">
                         <ul class="navbar-nav ms-auto align-items-lg-center gap-lg-2">
                             <li class="nav-item">
-                                <a class="@NavClass("Home")" asp-controller="Home" asp-action="Index">Dashboard</a>
+                                <a class="@NavClass("Home")" asp-controller="Home" asp-action="Index">Табло</a>
                             </li>
                             <li class="nav-item">
-                                <a class="@NavClass("Reports")" asp-controller="Reports" asp-action="Index">Reports</a>
+                                <a class="@NavClass("Reports")" asp-controller="Reports" asp-action="Index">Справки</a>
                             </li>
                             <li class="nav-item">
-                                <a class="@NavClass("Registry")" asp-controller="Registry" asp-action="Index">Registry</a>
+                                <a class="@NavClass("Registry")" asp-controller="Registry" asp-action="Index">Регистър</a>
                             </li>
                         </ul>
 
@@ -86,9 +95,12 @@
         <div class="container-xl footer-content">
             <div>
                 <strong>Fisherman</strong>
-                <p>Operational workspace for boats, catches and reporting.</p>
+                <p>Подреден интерфейс за лодки, улов и ежедневна аналитична работа.</p>
             </div>
-            <a asp-controller="Home" asp-action="Privacy">За проекта</a>
+            <div class="footer-links">
+                <span>@DateTime.Now.Year</span>
+                <a asp-controller="Home" asp-action="Privacy">За проекта</a>
+            </div>
         </div>
     </footer>
 
