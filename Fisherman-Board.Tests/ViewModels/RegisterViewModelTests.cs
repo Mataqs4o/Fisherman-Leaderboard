@@ -6,18 +6,33 @@ namespace Fisherman_Board.Tests.ViewModels;
 public class RegisterViewModelTests
 {
     [Fact]
-    public void Validate_WhenPasswordIsTooShort_ReturnsError()
+    public void Validate_WhenPasswordIsMissing_ReturnsError()
     {
         var model = new RegisterViewModel
         {
             Email = "operator@fisherman.bg",
-            Password = "123",
-            ConfirmPassword = "123"
+            Password = string.Empty,
+            ConfirmPassword = string.Empty
         };
 
         var results = ValidationTestHelper.Validate(model);
 
         Assert.True(ValidationTestHelper.HasErrorFor(results, nameof(RegisterViewModel.Password)));
+    }
+
+    [Fact]
+    public void Validate_WhenPasswordHasSingleCharacter_DoesNotReturnLengthError()
+    {
+        var model = new RegisterViewModel
+        {
+            Email = "operator@fisherman.bg",
+            Password = "a",
+            ConfirmPassword = "a"
+        };
+
+        var results = ValidationTestHelper.Validate(model);
+
+        Assert.DoesNotContain(results, result => result.MemberNames.Contains(nameof(RegisterViewModel.Password)));
     }
 
     [Fact]
