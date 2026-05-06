@@ -1,8 +1,11 @@
 @model Fisherman_Board.Models.FishingVessel
 @using Microsoft.AspNetCore.Mvc.Rendering
+@using System.Linq
 @{
     ViewData["Title"] = "Редакция на лодка";
     var engines = ViewBag.EngineOptions as SelectList;
+    var hasEngines = engines?.Any() ?? false;
+    var selectedEngineLabel = ViewBag.SelectedEngineLabel?.ToString();
 }
 
 <section class="page-header-card">
@@ -12,6 +15,14 @@
     </div>
     <p>Редактирайте наличен запис за лодка и запазете промените.</p>
 </section>
+
+@if (!string.IsNullOrWhiteSpace(selectedEngineLabel))
+{
+    <section class="content-card note-card">
+        <strong>Текущ двигател: @selectedEngineLabel</strong>
+        <span>Ако сте добавили нов двигател, той вече е избран. Натиснете „Запази промените“, за да се обнови и записът за лодката.</span>
+    </section>
+}
 
 <section class="form-card">
     <form method="post" asp-action="EditBoat">
@@ -34,10 +45,25 @@
                 <span asp-validation-for="CallSign" class="text-danger"></span>
             </div>
             <div class="form-field">
-                <label asp-for="EngineId"></label>
-                <select asp-for="EngineId" asp-items="engines" class="form-select">
-                    <option value="">Изберете двигател</option>
-                </select>
+                <div class="field-heading">
+                    <label asp-for="EngineId"></label>
+                    <a class="btn-inline" asp-action="CreateEngine" asp-route-returnTo="EditBoat" asp-route-vesselId="@Model.Id">Добави двигател</a>
+                </div>
+
+                @if (hasEngines)
+                {
+                    <select asp-for="EngineId" asp-items="engines" class="form-select">
+                        <option value="">Изберете двигател</option>
+                    </select>
+                }
+                else
+                {
+                    <div class="engine-helper-card">
+                        <strong>Няма въведени двигатели.</strong>
+                        <span>Добави двигател и след това ще можеш да го избереш за тази лодка.</span>
+                    </div>
+                }
+
                 <span asp-validation-for="EngineId" class="text-danger"></span>
             </div>
             <div class="form-field">
@@ -63,7 +89,7 @@
         </div>
 
         <div class="form-actions">
-            <button type="submit" class="btn btn-primary-soft">Запази промените</button>
+            <button type="submit" class="btn btn-primary-soft" @(hasEngines ? null : "disabled")>Запази промените</button>
             <a class="btn btn-ghost" asp-action="Boats">Отказ</a>
         </div>
     </form>
