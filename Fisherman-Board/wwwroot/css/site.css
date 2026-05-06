@@ -1725,6 +1725,24 @@ h4,
   line-height: 1.6;
 }
 
+.engine-helper-card {
+  display: grid;
+  gap: 0.35rem;
+  padding: 0.95rem 1rem;
+  border: 1px dashed rgba(16, 44, 60, 0.16);
+  border-radius: 18px;
+  background: rgba(248, 251, 250, 0.92);
+}
+
+.engine-helper-card strong {
+  color: #16384a;
+}
+
+.engine-helper-card span {
+  color: var(--muted);
+  line-height: 1.6;
+}
+
 @media (max-width: 767.98px) {
   .field-heading,
   .password-meter-row,
