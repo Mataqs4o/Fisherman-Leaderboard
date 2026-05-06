@@ -44,4 +44,18 @@ public class RegistryControllerTests
 
         Assert.IsType<NotFoundResult>(result);
     }
+
+    [Fact]
+    public void CreateEngine_WhenOpenedFromBoat_PreservesReturnContext()
+    {
+        var controller = new RegistryController(null!);
+
+        var result = controller.CreateEngine("EditBoat", 12);
+
+        var viewResult = Assert.IsType<ViewResult>(result);
+
+        Assert.IsType<Engine>(viewResult.Model);
+        Assert.Equal("EditBoat", controller.ViewData["EngineReturnTo"]);
+        Assert.Equal(12, controller.ViewData["EngineReturnVesselId"]);
+    }
 }
