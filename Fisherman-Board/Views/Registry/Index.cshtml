@@ -3,27 +3,38 @@
     ViewData["Title"] = "Регистри";
 }
 
-<section class="page-header-card">
-    <div>
-        <span class="eyebrow">Задача 3</span>
-        <h1>Редакция на част от данните</h1>
+<section class="page-header-card split-header" data-reveal="0">
+    <div class="split-header-copy">
+        <span class="eyebrow">Регистърна зона</span>
+        <h1>Редакция на основните таблици в по-чист и по-ясен интерфейс.</h1>
+        <p>
+            Тук е работната зона за преглед, търсене, добавяне, редакция и изтриване
+            на трите основни таблици: fisherman, лодки и улов.
+        </p>
     </div>
-    <p>
-        Регистърната част позволява преглед, търсене, добавяне, редакция и изтриване
-        на трите основни таблици, които поиска: fisherman, лодки и улов.
-    </p>
+
+    <aside class="split-header-aside">
+        <div class="stat-orb">
+            <span>3</span>
+            <small>основни таблици</small>
+        </div>
+        <div class="mini-panel">
+            <span class="mini-label">Поток</span>
+            <strong>Всяка карта отвежда директно до таблицата с търсене, добавяне и редакция.</strong>
+        </div>
+    </aside>
 </section>
 
 @if (!Model.DatabaseAvailable)
 {
-    <section class="content-card empty-state-card">
+    <section class="content-card empty-state-card" data-reveal="1">
         <h2>Базата данни не е достъпна</h2>
         <p>След като базата данни е налична, тук ще могат да се редактират записите в регистрите.</p>
     </section>
 }
 else
 {
-    <section class="metrics-grid">
+    <section class="metrics-grid" data-reveal="1">
         <article class="metric-card">
             <span>Fisherman</span>
             <strong>@Model.FishermenCount</strong>
@@ -42,20 +53,32 @@ else
     </section>
 }
 
-<section class="card-grid">
-    <article class="content-card">
+<section class="card-grid" data-reveal="2">
+    <article class="content-card feature-card">
+        <span class="card-kicker">Таблица 1</span>
         <h3>Fisherman</h3>
         <p>Таблица с рибари, дата на раждане и помощни атрибути за билети и разрешителни.</p>
-        <a class="text-link" asp-action="Fishermen">Отвори таблицата</a>
+        <div class="feature-meta">
+            <a class="text-link" asp-action="Fishermen">Отвори таблицата</a>
+            <span>Пълен CRUD поток</span>
+        </div>
     </article>
-    <article class="content-card">
+    <article class="content-card feature-card">
+        <span class="card-kicker">Таблица 2</span>
         <h3>Лодки</h3>
         <p>Таблица с лодки и техническите им характеристики за оперативни справки.</p>
-        <a class="text-link" asp-action="Boats">Отвори таблицата</a>
+        <div class="feature-meta">
+            <a class="text-link" asp-action="Boats">Отвори таблицата</a>
+            <span>Технически данни и редакция</span>
+        </div>
     </article>
-    <article class="content-card">
+    <article class="content-card feature-card">
+        <span class="card-kicker">Таблица 3</span>
         <h3>Улов</h3>
         <p>Таблица с улов по вид риба, количество и свързан излет.</p>
-        <a class="text-link" asp-action="Catches">Отвори таблицата</a>
+        <div class="feature-meta">
+            <a class="text-link" asp-action="Catches">Отвори таблицата</a>
+            <span>Бързо търсене и история</span>
+        </div>
     </article>
 </section>

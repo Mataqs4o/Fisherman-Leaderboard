@@ -165,25 +165,27 @@ public class RegistryController : Controller
         return View(model);
     }
 
-    public IActionResult CreateEngine()
+    public IActionResult CreateEngine(string? returnTo = null, int? vesselId = null)
     {
+        SetEngineReturnContext(returnTo, vesselId);
         return View(new Engine());
     }
 
     [HttpPost]
     [ValidateAntiForgeryToken]
-    public async Task<IActionResult> CreateEngine(Engine engine)
+    public async Task<IActionResult> CreateEngine(Engine engine, string? returnTo = null, int? vesselId = null)
     {
         if (!ModelState.IsValid)
         {
+            SetEngineReturnContext(returnTo, vesselId);
             return View(engine);
         }
 
         _context.Engines.Add(engine);
         await _context.SaveChangesAsync();
 
-        SetStatus("Двигателят беше добавен успешно.");
-        return RedirectToAction(nameof(Engines));
+        SetStatus(GetEngineCreatedMessage(returnTo));
+        return RedirectAfterEngineCreate(returnTo, vesselId, engine.Id);
     }
 
     public async Task<IActionResult> EditEngine(int id)
@@ -246,7 +248,7 @@ public class RegistryController : Controller
 
         if (!CanConnect())
         {
-            return View(Array.Empty<FishingVessel>());
+            return View("Vessels", Array.Empty<FishingVessel>());
         }
 
         var query = _context.FishingVessels
@@ -267,27 +269,36 @@ public class RegistryController : Controller
             .OrderBy(vessel => vessel.Marking)
             .ToListAsync();
 
-        return View(model);
+        return View("Vessels", model);
     }
 
     public Task<IActionResult> Boats(string? search) => Vessels(search);
 
-    public async Task<IActionResult> CreateVessel()
+    public async Task<IActionResult> CreateVessel(int? engineId = null)
     {
-        await PopulateEngineOptionsAsync();
-        return View(new FishingVessel());
+        await PopulateEngineOptionsAsync(engineId);
+        return View("CreateVessel", new FishingVessel
+        {
+            EngineId = engineId ?? 0
+        });
     }
 
-    public Task<IActionResult> CreateBoat() => CreateVessel();
+    public Task<IActionResult> CreateBoat(int? engineId = null) => CreateVessel(engineId);
+
+    [HttpPost]
+    [ValidateAntiForgeryToken]
+    public Task<IActionResult> CreateBoat(FishingVessel vessel) => CreateVessel(vessel);
 
     [HttpPost]
     [ValidateAntiForgeryToken]
     public async Task<IActionResult> CreateVessel(FishingVessel vessel)
     {
+        await ValidateEngineSelectionAsync(vessel.EngineId);
+
         if (!ModelState.IsValid)
         {
             await PopulateEngineOptionsAsync(vessel.EngineId);
-            return View(vessel);
+            return View("CreateVessel", vessel);
         }
 
         _context.FishingVessels.Add(vessel);
@@ -297,7 +308,7 @@ public class RegistryController : Controller
         return RedirectToAction(nameof(Boats));
     }
 
-    public async Task<IActionResult> EditVessel(int id)
+    public async Task<IActionResult> EditVessel(int id, int? engineId = null)
     {
         var vessel = await _context.FishingVessels.FindAsync(id);
         if (vessel is null)
@@ -305,11 +316,16 @@ public class RegistryController : Controller
             return NotFound();
         }
 
+        vessel.EngineId = engineId ?? vessel.EngineId;
         await PopulateEngineOptionsAsync(vessel.EngineId);
-        return View(vessel);
+        return View("EditVessel", vessel);
     }
 
-    public Task<IActionResult> EditBoat(int id) => EditVessel(id);
+    public Task<IActionResult> EditBoat(int id, int? engineId = null) => EditVessel(id, engineId);
+
+    [HttpPost]
+    [ValidateAntiForgeryToken]
+    public Task<IActionResult> EditBoat(int id, FishingVessel vessel) => EditVessel(id, vessel);
 
     [HttpPost]
     [ValidateAntiForgeryToken]
@@ -320,10 +336,12 @@ public class RegistryController : Controller
             return NotFound();
         }
 
+        await ValidateEngineSelectionAsync(vessel.EngineId);
+
         if (!ModelState.IsValid)
         {
             await PopulateEngineOptionsAsync(vessel.EngineId);
-            return View(vessel);
+            return View("EditVessel", vessel);
         }
 
         _context.Update(vessel);
@@ -481,6 +499,50 @@ public class RegistryController : Controller
             .ToListAsync();
 
         ViewBag.EngineOptions = new SelectList(engines, "Id", "Label", selectedEngineId);
+        ViewBag.HasEngines = engines.Count > 0;
+        ViewBag.SelectedEngineLabel = engines
+            .FirstOrDefault(engine => engine.Id == selectedEngineId)
+            ?.Label;
+    }
+
+    private async Task ValidateEngineSelectionAsync(int engineId)
+    {
+        if (engineId <= 0 || !await _context.Engines.AsNoTracking().AnyAsync(engine => engine.Id == engineId))
+        {
+            ModelState.AddModelError(nameof(FishingVessel.EngineId), "Изберете наличен двигател или добавете нов.");
+        }
+    }
+
+    private void SetEngineReturnContext(string? returnTo, int? vesselId)
+    {
+        ViewData["EngineReturnTo"] = returnTo;
+        ViewData["EngineReturnVesselId"] = vesselId;
+    }
+
+    private IActionResult RedirectAfterEngineCreate(string? returnTo, int? vesselId, int engineId)
+    {
+        if (string.Equals(returnTo, nameof(CreateBoat), StringComparison.OrdinalIgnoreCase))
+        {
+            return RedirectToAction(nameof(CreateBoat), new { engineId });
+        }
+
+        if (string.Equals(returnTo, nameof(EditBoat), StringComparison.OrdinalIgnoreCase) && vesselId.HasValue)
+        {
+            return RedirectToAction(nameof(EditBoat), new { id = vesselId.Value, engineId });
+        }
+
+        return RedirectToAction(nameof(Engines));
+    }
+
+    private static string GetEngineCreatedMessage(string? returnTo)
+    {
+        if (string.Equals(returnTo, nameof(CreateBoat), StringComparison.OrdinalIgnoreCase) ||
+            string.Equals(returnTo, nameof(EditBoat), StringComparison.OrdinalIgnoreCase))
+        {
+            return "Двигателят беше добавен. Сега довършете лодката и натиснете „Запази“.";
+        }
+
+        return "Двигателят беше добавен успешно.";
     }
 
     private async Task PopulateTripOptionsAsync(int? selectedTripId = null)

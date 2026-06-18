@@ -3,36 +3,56 @@
     ViewData["Title"] = "Оперативно табло";
 }
 
-<section class="hero-panel">
+<section class="hero-panel hero-panel-home" data-reveal="0">
     <div class="hero-copy">
-        <span class="eyebrow">Fisherman</span>
-        <h1>One operating surface for boats, catches and live fishing reports.</h1>
+        <span class="eyebrow">Fisherman workspace</span>
+        <h1>По-подредено управление на лодки, улов и оперативни справки.</h1>
         <p>
-            Built to feel fast, clear and focused: direct access to reporting, clean registry tables
-            and a simple workflow for the people who run the data every day.
+            Fisherman събира ежедневната работа в една професионална среда: бърз достъп до основните
+            регистри, ясен преглед на ключовите показатели и по-спокоен поток за операторите.
         </p>
 
         <div class="hero-actions">
-            <a class="btn btn-primary-soft" asp-controller="Reports" asp-action="Index">Open reports</a>
-            <a class="btn btn-ghost-dark" asp-controller="Registry" asp-action="Index">Open registry</a>
+            <a class="btn btn-primary-soft" asp-controller="Reports" asp-action="Index">Отвори справките</a>
+            <a class="btn btn-ghost-dark" asp-controller="Registry" asp-action="Index">Отвори регистрите</a>
+        </div>
+
+        <div class="signal-strip">
+            <article class="signal-chip">
+                <strong>3</strong>
+                <span>Основни регистъра</span>
+            </article>
+            <article class="signal-chip">
+                <strong>Live</strong>
+                <span>Оперативни показатели</span>
+            </article>
+            <article class="signal-chip">
+                <strong>Fast</strong>
+                <span>По-малко кликове по основния път</span>
+            </article>
         </div>
     </div>
 
-    <aside class="hero-aside">
-        <div class="mini-panel">
-            <span class="mini-label">Аналитичен акцент</span>
-            <strong>@(string.IsNullOrWhiteSpace(Model.TopInsight) ? "Добавете данни, за да видите лидерите." : Model.TopInsight)</strong>
+    <aside class="hero-visual" data-reveal="1">
+        <div class="illustration-card" data-parallax>
+            <img class="hero-illustration" src="~/images/harbor-console.svg" alt="Морска контролна илюстрация за Fisherman" />
         </div>
-        <div class="mini-panel">
-            <span class="mini-label">Оперативно известие</span>
-            <strong>@(string.IsNullOrWhiteSpace(Model.AlertInsight) ? "Сроковете на разрешителните ще се появят тук." : Model.AlertInsight)</strong>
-        </div>
+
+        <article class="floating-badge floating-badge-primary">
+            <span class="mini-label">Състояние</span>
+            <strong>@(Model.DatabaseAvailable ? "Системата е готова за работа" : "Изчаква връзка с базата данни")</strong>
+        </article>
+
+        <article class="floating-badge floating-badge-secondary">
+            <span class="mini-label">Фокус</span>
+            <strong>@(string.IsNullOrWhiteSpace(Model.TopInsight) ? "Добавете данни, за да се появят лидерите и трендовете." : Model.TopInsight)</strong>
+        </article>
     </aside>
 </section>
 
 @if (!Model.DatabaseAvailable)
 {
-    <section class="content-card empty-state-card">
+    <section class="content-card empty-state-card" data-reveal="2">
         <h2>Базата данни не е достъпна</h2>
         <p>
             Приложението е готово, но към момента няма връзка с конфигурираната SQL база.
@@ -42,34 +62,34 @@
 }
 else
 {
-    <section class="metrics-grid">
+    <section class="metrics-grid" data-reveal="2">
         <article class="metric-card">
             <span>Кораби</span>
             <strong>@Model.TotalVessels</strong>
-            <p>Регистрирани риболовни кораби.</p>
+            <p>Регистрирани лодки и кораби в системата.</p>
         </article>
         <article class="metric-card">
             <span>Активни разрешителни</span>
             <strong>@Model.ActivePermits</strong>
-            <p>Разрешителни с текуща валидност.</p>
+            <p>Разрешителни с текуща валидност и готов статус за проверка.</p>
         </article>
         <article class="metric-card">
             <span>Излети тази година</span>
             <strong>@Model.TripsThisYear</strong>
-            <p>Излети, стартирали от началото на годината.</p>
+            <p>Излети, отчетени от началото на годината.</p>
         </article>
         <article class="metric-card">
             <span>Любителски билети</span>
             <strong>@Model.RecreationalTickets</strong>
-            <p>Активни билети за любителски риболов.</p>
+            <p>Активни билети за любителски риболов и класации.</p>
         </article>
     </section>
 }
 
-<section class="section-shell">
+<section class="section-shell" data-reveal="3">
     <div class="section-heading">
         <div>
-            <span class="eyebrow">Задача 2</span>
+            <span class="eyebrow">Анализи</span>
             <h2>Оперативни справки</h2>
         </div>
         <a asp-controller="Reports" asp-action="Index">Всички справки</a>
@@ -78,19 +98,23 @@ else
     <div class="card-grid">
         @foreach (var card in Model.ReportCards)
         {
-            <article class="content-card">
+            <article class="content-card feature-card">
+                <span class="card-kicker">Справка</span>
                 <h3>@card.Title</h3>
                 <p>@card.Description</p>
-                <a class="text-link" asp-controller="@card.Controller" asp-action="@card.Action">Отвори изглед</a>
+                <div class="feature-meta">
+                    <a class="text-link" asp-controller="@card.Controller" asp-action="@card.Action">Отвори изгледа</a>
+                    <span>Готово за преглед</span>
+                </div>
             </article>
         }
     </div>
 </section>
 
-<section class="section-shell">
+<section class="section-shell" data-reveal="4">
     <div class="section-heading">
         <div>
-            <span class="eyebrow">Задача 3</span>
+            <span class="eyebrow">Редакция</span>
             <h2>Редакция на данни</h2>
         </div>
         <a asp-controller="Registry" asp-action="Index">Към регистрите</a>
@@ -99,10 +123,14 @@ else
     <div class="card-grid">
         @foreach (var card in Model.RegistryCards)
         {
-            <article class="content-card">
+            <article class="content-card feature-card">
+                <span class="card-kicker">Регистър</span>
                 <h3>@card.Title</h3>
                 <p>@card.Description</p>
-                <a class="text-link" asp-controller="@card.Controller" asp-action="@card.Action">Отвори регистъра</a>
+                <div class="feature-meta">
+                    <a class="text-link" asp-controller="@card.Controller" asp-action="@card.Action">Отвори регистъра</a>
+                    <span>Добавяне, редакция и търсене</span>
+                </div>
             </article>
         }
     </div>

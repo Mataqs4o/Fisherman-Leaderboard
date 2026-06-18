@@ -1,28 +1,32 @@
 @model Fisherman_Board.ViewModels.LoginViewModel
 @{
-    ViewData["Title"] = "Log in";
+    ViewData["Title"] = "Вход";
 }
 
-<section class="auth-stage">
+<section class="auth-stage" data-reveal="0">
     <div class="auth-story">
-        <span class="eyebrow">Fisherman</span>
-        <h1>Welcome back.</h1>
+        <span class="eyebrow">Fisherman access</span>
+        <h1>Добре дошъл обратно в работната среда.</h1>
         <p>
-            Sign in to manage boats, update catches and move through the reporting workspace without friction.
+            Влез, за да продължиш с регистрите, улова и оперативните справки в един по-чист и по-спокоен интерфейс.
         </p>
+
+        <div class="auth-illustration-shell" data-parallax>
+            <img class="auth-illustration" src="~/images/auth-beacon.svg" alt="Илюстрация за достъп до Fisherman" />
+        </div>
 
         <div class="auth-highlights">
             <article class="auth-highlight-card">
-                <strong>Focused</strong>
-                <span>Quick access to the three core tables and the live report views.</span>
+                <strong>Ясен вход</strong>
+                <span>Бърз достъп до трите основни таблици и аналитичните екрани.</span>
             </article>
             <article class="auth-highlight-card">
-                <strong>Readable</strong>
-                <span>Clear layouts, high-contrast forms and fewer decisions on the critical path.</span>
+                <strong>По-малко шум</strong>
+                <span>Формите са по-четими и подреждат най-важното в първия поглед.</span>
             </article>
             <article class="auth-highlight-card">
-                <strong>Operational</strong>
-                <span>Built for daily data work, not for demo-only navigation.</span>
+                <strong>Готово за работа</strong>
+                <span>Създадено за ежедневна оперативна употреба, не само за демонстрация.</span>
             </article>
         </div>
     </div>
@@ -30,8 +34,8 @@
     <div class="auth-card">
         <div class="auth-card-head">
             <span class="auth-kicker">Account access</span>
-            <h2>Log in to Fisherman</h2>
-            <p>Use your email and password to continue.</p>
+            <h2>Вход в Fisherman</h2>
+            <p>Използвай имейл и парола, за да продължиш.</p>
         </div>
 
         <form method="post" class="auth-form">
@@ -52,15 +56,15 @@
 
             <label class="checkbox-wrap auth-checkbox">
                 <input asp-for="RememberMe" />
-                <span>Keep me signed in on this device</span>
+                <span>Запомни ме на това устройство</span>
             </label>
 
-            <button type="submit" class="btn btn-auth-primary">Log in</button>
+            <button type="submit" class="btn btn-auth-primary">Вход</button>
         </form>
 
         <div class="auth-meta">
-            <span>New here?</span>
-            <a asp-action="Register">Create an account</a>
+            <span>Нямаш профил?</span>
+            <a asp-action="Register">Създай акаунт</a>
         </div>
     </div>
 </section>

@@ -1,6 +1,8 @@
 @model Fisherman_Board.Models.Engine
 @{
     ViewData["Title"] = "Добавяне на двигател";
+    var returnTo = ViewData["EngineReturnTo"]?.ToString();
+    var vesselId = ViewData["EngineReturnVesselId"] is int value ? value : (int?)null;
 }
 
 <section class="page-header-card">
@@ -11,8 +13,18 @@
     <p>Въведете параметрите, които ще се използват в регистрите и аналитичните изчисления.</p>
 </section>
 
+@if (!string.IsNullOrWhiteSpace(returnTo))
+{
+    <section class="content-card note-card">
+        <strong>След запазване ще се върнеш обратно към лодката.</strong>
+        <span>Новият двигател ще бъде избран автоматично, за да можеш веднага да довършиш записа.</span>
+    </section>
+}
+
 <section class="form-card">
     <form method="post">
+        <input type="hidden" name="returnTo" value="@returnTo" />
+        <input type="hidden" name="vesselId" value="@vesselId" />
         <div asp-validation-summary="ModelOnly" class="validation-summary"></div>
         <div class="form-grid">
             <div class="form-field">
@@ -39,7 +51,18 @@
 
         <div class="form-actions">
             <button type="submit" class="btn btn-primary-soft">Запази</button>
-            <a class="btn btn-ghost" asp-action="Engines">Отказ</a>
+            @if (string.Equals(returnTo, "CreateBoat", StringComparison.OrdinalIgnoreCase))
+            {
+                <a class="btn btn-ghost" asp-action="CreateBoat">Назад към лодката</a>
+            }
+            else if (string.Equals(returnTo, "EditBoat", StringComparison.OrdinalIgnoreCase) && vesselId.HasValue)
+            {
+                <a class="btn btn-ghost" asp-action="EditBoat" asp-route-id="@vesselId.Value">Назад към лодката</a>
+            }
+            else
+            {
+                <a class="btn btn-ghost" asp-action="Engines">Отказ</a>
+            }
         </div>
     </form>
 </section>
