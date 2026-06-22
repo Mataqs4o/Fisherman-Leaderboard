@@ -1,0 +1,80 @@
+@model Fisherman_Board.Models.FishingTrip
+@using Microsoft.AspNetCore.Mvc.Rendering
+@using System.Linq
+@{
+    ViewData["Title"] = "Добавяне на излет";
+    var vessels = ViewBag.VesselOptions as SelectList;
+    var hasVessels = ViewBag.HasVessels as bool? ?? (vessels?.Any() ?? false);
+    var returnTo = ViewData["TripReturnTo"]?.ToString();
+}
+
+<section class="page-header-card">
+    <div>
+        <span class="eyebrow">Нов запис</span>
+        <h1>Добавяне на излет</h1>
+    </div>
+    <p>Първо добавете излет, след това към него може да добавите улов.</p>
+</section>
+
+<section class="form-card">
+    <form method="post" asp-action="CreateTrip">
+        <input type="hidden" name="returnTo" value="@returnTo" />
+
+        <div asp-validation-summary="All" class="validation-summary text-danger"></div>
+
+        <div class="form-grid">
+            <div class="form-field">
+                <label asp-for="FishingVesselId"></label>
+
+                @if (hasVessels)
+                {
+                    <select asp-for="FishingVesselId" asp-items="vessels" class="form-select">
+                        <option value="">Изберете лодка</option>
+                    </select>
+                }
+                else
+                {
+                    <div class="engine-helper-card">
+                        <strong>Няма добавени лодки.</strong>
+                        <span>Първо добавете лодка, след това ще можете да създадете излет.</span>
+                    </div>
+                }
+
+                <span asp-validation-for="FishingVesselId" class="text-danger"></span>
+            </div>
+
+            <div class="form-field">
+                <label asp-for="StartTime"></label>
+                <input asp-for="StartTime" class="form-control" type="datetime-local" />
+                <span asp-validation-for="StartTime" class="text-danger"></span>
+            </div>
+
+            <div class="form-field">
+                <label asp-for="EndTime"></label>
+                <input asp-for="EndTime" class="form-control" type="datetime-local" />
+                <span asp-validation-for="EndTime" class="text-danger"></span>
+            </div>
+
+            <div class="form-field">
+                <label asp-for="StartLocation"></label>
+                <input asp-for="StartLocation" class="form-control" />
+                <span asp-validation-for="StartLocation" class="text-danger"></span>
+            </div>
+
+            <div class="form-field">
+                <label asp-for="EndLocation"></label>
+                <input asp-for="EndLocation" class="form-control" />
+                <span asp-validation-for="EndLocation" class="text-danger"></span>
+            </div>
+        </div>
+
+        <div class="form-actions">
+            <button type="submit" class="btn btn-primary-soft" @(hasVessels ? null : "disabled")>Запази</button>
+            <a class="btn btn-ghost" asp-action="CreateCatch">Отказ</a>
+        </div>
+    </form>
+</section>
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+}

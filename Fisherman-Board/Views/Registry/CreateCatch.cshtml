@@ -1,8 +1,10 @@
 @model Fisherman_Board.Models.CatchRecord
 @using Microsoft.AspNetCore.Mvc.Rendering
+@using System.Linq
 @{
     ViewData["Title"] = "Добавяне на улов";
     var trips = ViewBag.TripOptions as SelectList;
+    var hasTrips = ViewBag.HasTrips as bool? ?? (trips?.Any() ?? false);
 }
 
 <section class="page-header-card">
@@ -14,30 +16,48 @@
 </section>
 
 <section class="form-card">
-    <form method="post">
-        <div asp-validation-summary="ModelOnly" class="validation-summary"></div>
+    <form method="post" asp-action="CreateCatch">
+        <div asp-validation-summary="All" class="validation-summary text-danger"></div>
+
         <div class="form-grid">
             <div class="form-field">
                 <label asp-for="Species"></label>
                 <input asp-for="Species" class="form-control" />
                 <span asp-validation-for="Species" class="text-danger"></span>
             </div>
+
             <div class="form-field">
                 <label asp-for="QuantityKg"></label>
                 <input asp-for="QuantityKg" class="form-control" />
                 <span asp-validation-for="QuantityKg" class="text-danger"></span>
             </div>
+
             <div class="form-field">
-                <label asp-for="FishingTripId"></label>
-                <select asp-for="FishingTripId" asp-items="trips" class="form-select">
-                    <option value="">Изберете излет</option>
-                </select>
+                <div class="field-heading">
+                    <label asp-for="FishingTripId"></label>
+                    <a class="btn-inline" asp-action="CreateTrip" asp-route-returnTo="CreateCatch">Добави излет</a>
+                </div>
+
+                @if (hasTrips)
+                {
+                    <select asp-for="FishingTripId" asp-items="trips" class="form-select">
+                        <option value="">Изберете излет</option>
+                    </select>
+                }
+                else
+                {
+                    <div class="engine-helper-card">
+                        <strong>Няма добавени излети.</strong>
+                        <span>Натиснете „Добави излет“, създайте излет и след това ще можете да добавите улов.</span>
+                    </div>
+                }
+
                 <span asp-validation-for="FishingTripId" class="text-danger"></span>
             </div>
         </div>
 
         <div class="form-actions">
-            <button type="submit" class="btn btn-primary-soft">Запази</button>
+            <button type="submit" class="btn btn-primary-soft" @(hasTrips ? null : "disabled")>Запази</button>
             <a class="btn btn-ghost" asp-action="Catches">Отказ</a>
         </div>
     </form>

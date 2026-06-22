@@ -27,7 +27,7 @@
 <section class="form-card">
     <form method="post" asp-action="EditBoat">
         <input asp-for="Id" type="hidden" />
-        <div asp-validation-summary="ModelOnly" class="validation-summary"></div>
+        <div asp-validation-summary="All" class="validation-summary text-danger"></div>
         <div class="form-grid">
             <div class="form-field">
                 <label asp-for="Marking"></label>
