@@ -80,12 +80,16 @@ public class ReportsController : Controller
         return View(model);
     }
 
-    public async Task<IActionResult> ExpiringPermits(string? search)
+    public async Task<IActionResult> ExpiringPermits(string? search, string? sortBy, string? sortDir)
     {
         var now = DateTime.UtcNow;
         var nextMonth = now.AddMonths(1);
+        var normalizedSortBy = NormalizeSortBy(sortBy, "validTo", "vessel", "number", "validTo", "daysLeft");
+        var normalizedSortDir = NormalizeSortDir(sortDir);
 
         ViewData["Search"] = search;
+        ViewData["SortBy"] = normalizedSortBy;
+        ViewData["SortDir"] = normalizedSortDir;
 
         if (!CanConnect())
         {
@@ -109,18 +113,21 @@ public class ReportsController : Controller
                 item.InternationalNumber.Contains(search));
         }
 
-        var model = await query
-            .OrderBy(item => item.ValidTo)
+        var model = await ApplyExpiringPermitsSort(query, normalizedSortBy, normalizedSortDir)
             .ToListAsync();
 
         return View(model);
     }
 
-    public async Task<IActionResult> TopRecreational(string? search)
+    public async Task<IActionResult> TopRecreational(string? search, string? sortBy, string? sortDir)
     {
         var oneYearAgo = DateTime.UtcNow.AddYears(-1);
+        var normalizedSortBy = NormalizeSortBy(sortBy, "catch", "fisher", "catch");
+        var normalizedSortDir = NormalizeSortDir(sortDir, "desc");
 
         ViewData["Search"] = search;
+        ViewData["SortBy"] = normalizedSortBy;
+        ViewData["SortDir"] = normalizedSortDir;
 
         if (!CanConnect())
         {
@@ -146,18 +153,32 @@ public class ReportsController : Controller
             query = query.Where(item => item.FisherName.Contains(search));
         }
 
-        var model = await query
-            .OrderByDescending(item => item.TotalKg)
+        var model = await ApplyTopRecreationalSort(query, normalizedSortBy, normalizedSortDir)
             .ToListAsync();
 
         return View(model);
     }
 
-    public async Task<IActionResult> VesselStats(string? search)
+    public async Task<IActionResult> VesselStats(string? search, string? sortBy, string? sortDir)
     {
         var yearStart = new DateTime(DateTime.UtcNow.Year, 1, 1);
+        var normalizedSortBy = NormalizeSortBy(
+            sortBy,
+            "catch",
+            "vessel",
+            "trips",
+            "catch",
+            "avgDuration",
+            "minDuration",
+            "maxDuration",
+            "avgCatch",
+            "minCatch",
+            "maxCatch");
+        var normalizedSortDir = NormalizeSortDir(sortDir, "desc");
 
         ViewData["Search"] = search;
+        ViewData["SortBy"] = normalizedSortBy;
+        ViewData["SortDir"] = normalizedSortDir;
 
         if (!CanConnect())
         {
@@ -190,16 +211,20 @@ public class ReportsController : Controller
             query = query.Where(item => item.VesselMarking.Contains(search));
         }
 
-        var model = await query
-            .OrderByDescending(item => item.TotalCatchKg)
+        var model = await ApplyVesselStatsSort(query, normalizedSortBy, normalizedSortDir)
             .ToListAsync();
 
         return View(model);
     }
 
-    public async Task<IActionResult> CarbonFootprint(string? search)
+    public async Task<IActionResult> CarbonFootprint(string? search, string? sortBy, string? sortDir)
     {
+        var normalizedSortBy = NormalizeSortBy(sortBy, "carbon", "vessel", "catch", "fuel", "carbon");
+        var normalizedSortDir = NormalizeSortDir(sortDir);
+
         ViewData["Search"] = search;
+        ViewData["SortBy"] = normalizedSortBy;
+        ViewData["SortDir"] = normalizedSortDir;
 
         if (!CanConnect())
         {
@@ -213,7 +238,8 @@ public class ReportsController : Controller
             query = query.Where(item => item.VesselMarking.Contains(search));
         }
 
-        var model = await query.ToListAsync();
+        var model = await ApplyCarbonFootprintSort(query, normalizedSortBy, normalizedSortDir)
+            .ToListAsync();
 
         return View(model);
     }
@@ -258,6 +284,149 @@ public class ReportsController : Controller
                 CarbonPerKg = (item.TotalHours * item.FuelPerHour) / item.TotalCatchKg
             })
             .OrderBy(item => item.CarbonPerKg);
+    }
+
+    private static IQueryable<ExpiringPermitViewModel> ApplyExpiringPermitsSort(
+        IQueryable<ExpiringPermitViewModel> query,
+        string sortBy,
+        string sortDir)
+    {
+        var descending = IsDescending(sortDir);
+
+        return sortBy switch
+        {
+            "vessel" => descending
+                ? query.OrderByDescending(item => item.VesselMarking)
+                : query.OrderBy(item => item.VesselMarking),
+            "number" => descending
+                ? query.OrderByDescending(item => item.InternationalNumber)
+                : query.OrderBy(item => item.InternationalNumber),
+            "daysLeft" => descending
+                ? query.OrderByDescending(item => item.ValidTo)
+                : query.OrderBy(item => item.ValidTo),
+            _ => descending
+                ? query.OrderByDescending(item => item.ValidTo)
+                : query.OrderBy(item => item.ValidTo)
+        };
+    }
+
+    private static IQueryable<TopRecreationalViewModel> ApplyTopRecreationalSort(
+        IQueryable<TopRecreationalViewModel> query,
+        string sortBy,
+        string sortDir)
+    {
+        var descending = IsDescending(sortDir);
+
+        return sortBy switch
+        {
+            "fisher" => descending
+                ? query.OrderByDescending(item => item.FisherName)
+                : query.OrderBy(item => item.FisherName),
+            _ => descending
+                ? query.OrderByDescending(item => item.TotalKg)
+                : query.OrderBy(item => item.TotalKg)
+        };
+    }
+
+    private static IQueryable<VesselStatsViewModel> ApplyVesselStatsSort(
+        IQueryable<VesselStatsViewModel> query,
+        string sortBy,
+        string sortDir)
+    {
+        var descending = IsDescending(sortDir);
+
+        return sortBy switch
+        {
+            "vessel" => descending
+                ? query.OrderByDescending(item => item.VesselMarking)
+                : query.OrderBy(item => item.VesselMarking),
+            "trips" => descending
+                ? query.OrderByDescending(item => item.TripsCount)
+                : query.OrderBy(item => item.TripsCount),
+            "avgDuration" => descending
+                ? query.OrderByDescending(item => item.AvgTripDurationHours)
+                : query.OrderBy(item => item.AvgTripDurationHours),
+            "minDuration" => descending
+                ? query.OrderByDescending(item => item.MinTripDurationHours)
+                : query.OrderBy(item => item.MinTripDurationHours),
+            "maxDuration" => descending
+                ? query.OrderByDescending(item => item.MaxTripDurationHours)
+                : query.OrderBy(item => item.MaxTripDurationHours),
+            "avgCatch" => descending
+                ? query.OrderByDescending(item => item.AvgCatchPerTrip)
+                : query.OrderBy(item => item.AvgCatchPerTrip),
+            "minCatch" => descending
+                ? query.OrderByDescending(item => item.MinCatchPerTrip)
+                : query.OrderBy(item => item.MinCatchPerTrip),
+            "maxCatch" => descending
+                ? query.OrderByDescending(item => item.MaxCatchPerTrip)
+                : query.OrderBy(item => item.MaxCatchPerTrip),
+            _ => descending
+                ? query.OrderByDescending(item => item.TotalCatchKg)
+                : query.OrderBy(item => item.TotalCatchKg)
+        };
+    }
+
+    private static IQueryable<CarbonFootprintViewModel> ApplyCarbonFootprintSort(
+        IQueryable<CarbonFootprintViewModel> query,
+        string sortBy,
+        string sortDir)
+    {
+        var descending = IsDescending(sortDir);
+
+        return sortBy switch
+        {
+            "vessel" => descending
+                ? query.OrderByDescending(item => item.VesselMarking)
+                : query.OrderBy(item => item.VesselMarking),
+            "catch" => descending
+                ? query.OrderByDescending(item => item.TotalCatchKg)
+                : query.OrderBy(item => item.TotalCatchKg),
+            "fuel" => descending
+                ? query.OrderByDescending(item => item.TotalFuel)
+                : query.OrderBy(item => item.TotalFuel),
+            _ => descending
+                ? query.OrderByDescending(item => item.CarbonPerKg)
+                : query.OrderBy(item => item.CarbonPerKg)
+        };
+    }
+
+    private static string NormalizeSortBy(string? sortBy, string defaultSortBy, params string[] allowedSortColumns)
+    {
+        if (string.IsNullOrWhiteSpace(sortBy))
+        {
+            return defaultSortBy;
+        }
+
+        foreach (var allowedSortColumn in allowedSortColumns)
+        {
+            if (string.Equals(sortBy, allowedSortColumn, StringComparison.OrdinalIgnoreCase))
+            {
+                return allowedSortColumn;
+            }
+        }
+
+        return defaultSortBy;
+    }
+
+    private static string NormalizeSortDir(string? sortDir, string defaultSortDir = "asc")
+    {
+        if (string.Equals(sortDir, "asc", StringComparison.OrdinalIgnoreCase))
+        {
+            return "asc";
+        }
+
+        if (string.Equals(sortDir, "desc", StringComparison.OrdinalIgnoreCase))
+        {
+            return "desc";
+        }
+
+        return defaultSortDir;
+    }
+
+    private static bool IsDescending(string sortDir)
+    {
+        return string.Equals(sortDir, "desc", StringComparison.OrdinalIgnoreCase);
     }
 
     private bool CanConnect()
