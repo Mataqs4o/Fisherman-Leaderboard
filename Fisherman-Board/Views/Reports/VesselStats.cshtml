@@ -1,7 +1,20 @@
+@using System
 @model IEnumerable<Fisherman_Board.ViewModels.VesselStatsViewModel>
 @{
     ViewData["Title"] = "Статистика за кораби";
     var search = ViewData["Search"]?.ToString() ?? string.Empty;
+    var sortBy = ViewData["SortBy"]?.ToString() ?? "catch";
+    var sortDir = ViewData["SortDir"]?.ToString() ?? "desc";
+
+    string NextSortDir(string column) =>
+        string.Equals(sortBy, column, StringComparison.OrdinalIgnoreCase) && sortDir == "asc"
+            ? "desc"
+            : "asc";
+
+    string SortIndicator(string column) =>
+        string.Equals(sortBy, column, StringComparison.OrdinalIgnoreCase)
+            ? (sortDir == "asc" ? " ▲" : " ▼")
+            : string.Empty;
 }
 
 <section class="page-header-card">
@@ -14,6 +27,8 @@
 
 <section class="toolbar-card">
     <form class="search-form" method="get">
+        <input type="hidden" name="sortBy" value="@sortBy" />
+        <input type="hidden" name="sortDir" value="@sortDir" />
         <input type="search" name="search" value="@search" placeholder="Търсене по маркировка" />
         <button type="submit" class="btn btn-primary-soft">Търси</button>
         <a class="btn btn-ghost" asp-action="VesselStats">Изчисти</a>
@@ -34,28 +49,36 @@ else
         <table class="table table-app">
             <thead>
                 <tr>
-                    <th>Кораб</th>
-                    <th>Излети</th>
-                    <th>Общ улов</th>
-                    <th>Средна продължителност</th>
+                    <th><a asp-action="VesselStats" asp-route-search="@search" asp-route-sortBy="vessel" asp-route-sortDir='@NextSortDir("vessel")'>Кораб@SortIndicator("vessel")</a></th>
+                    <th><a asp-action="VesselStats" asp-route-search="@search" asp-route-sortBy="trips" asp-route-sortDir='@NextSortDir("trips")'>Излети@SortIndicator("trips")</a></th>
+                    <th><a asp-action="VesselStats" asp-route-search="@search" asp-route-sortBy="catch" asp-route-sortDir='@NextSortDir("catch")'>Общ улов@SortIndicator("catch")</a></th>
+                    <th><a asp-action="VesselStats" asp-route-search="@search" asp-route-sortBy="avgDuration" asp-route-sortDir='@NextSortDir("avgDuration")'>Средна продължителност@SortIndicator("avgDuration")</a></th>
                     <th>Мин/Макс продължителност</th>
-                    <th>Среден улов на излет</th>
+                    <th><a asp-action="VesselStats" asp-route-search="@search" asp-route-sortBy="avgCatch" asp-route-sortDir='@NextSortDir("avgCatch")'>Среден улов на излет@SortIndicator("avgCatch")</a></th>
                     <th>Мин/Макс улов</th>
                 </tr>
             </thead>
             <tbody>
-            @foreach (var item in Model)
-            {
-                <tr>
-                    <td>@item.VesselMarking</td>
-                    <td>@item.TripsCount</td>
-                    <td>@item.TotalCatchKg.ToString("F2") кг</td>
-                    <td>@item.AvgTripDurationHours.ToString("F2") ч.</td>
-                    <td>@item.MinTripDurationHours.ToString("F2") / @item.MaxTripDurationHours.ToString("F2") ч.</td>
-                    <td>@item.AvgCatchPerTrip.ToString("F2") кг</td>
-                    <td>@item.MinCatchPerTrip.ToString("F2") / @item.MaxCatchPerTrip.ToString("F2") кг</td>
-                </tr>
-            }
+                @foreach (var item in Model)
+                {
+                    <tr>
+                        <td>@item.VesselMarking</td>
+                        <td>@item.TripsCount</td>
+                        <td>@item.TotalCatchKg.ToString("F2") кг</td>
+                        <td>@item.AvgTripDurationHours.ToString("F2") ч.</td>
+                        <td>
+                            <a asp-action="VesselStats" asp-route-search="@search" asp-route-sortBy="minDuration" asp-route-sortDir='@NextSortDir("minDuration")'>@item.MinTripDurationHours.ToString("F2")@SortIndicator("minDuration")</a>
+                            /
+                            <a asp-action="VesselStats" asp-route-search="@search" asp-route-sortBy="maxDuration" asp-route-sortDir='@NextSortDir("maxDuration")'>@item.MaxTripDurationHours.ToString("F2")@SortIndicator("maxDuration")</a> ч.
+                        </td>
+                        <td>@item.AvgCatchPerTrip.ToString("F2") кг</td>
+                        <td>
+                            <a asp-action="VesselStats" asp-route-search="@search" asp-route-sortBy="minCatch" asp-route-sortDir='@NextSortDir("minCatch")'>@item.MinCatchPerTrip.ToString("F2")@SortIndicator("minCatch")</a>
+                            /
+                            <a asp-action="VesselStats" asp-route-search="@search" asp-route-sortBy="maxCatch" asp-route-sortDir='@NextSortDir("maxCatch")'>@item.MaxCatchPerTrip.ToString("F2")@SortIndicator("maxCatch")</a> кг
+                        </td>
+                    </tr>
+                }
             </tbody>
         </table>
     </section>

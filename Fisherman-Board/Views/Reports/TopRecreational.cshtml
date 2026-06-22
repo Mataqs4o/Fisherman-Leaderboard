@@ -1,8 +1,21 @@
+@using System
 @model IEnumerable<Fisherman_Board.ViewModels.TopRecreationalViewModel>
 @{
     ViewData["Title"] = "Топ любители";
     var search = ViewData["Search"]?.ToString() ?? string.Empty;
+    var sortBy = ViewData["SortBy"]?.ToString() ?? "catch";
+    var sortDir = ViewData["SortDir"]?.ToString() ?? "desc";
     var rank = 0;
+
+    string NextSortDir(string column) =>
+        string.Equals(sortBy, column, StringComparison.OrdinalIgnoreCase) && sortDir == "asc"
+            ? "desc"
+            : "asc";
+
+    string SortIndicator(string column) =>
+        string.Equals(sortBy, column, StringComparison.OrdinalIgnoreCase)
+            ? (sortDir == "asc" ? " ▲" : " ▼")
+            : string.Empty;
 }
 
 <section class="page-header-card">
@@ -15,6 +28,8 @@
 
 <section class="toolbar-card">
     <form class="search-form" method="get">
+        <input type="hidden" name="sortBy" value="@sortBy" />
+        <input type="hidden" name="sortDir" value="@sortDir" />
         <input type="search" name="search" value="@search" placeholder="Търсене по име" />
         <button type="submit" class="btn btn-primary-soft">Търси</button>
         <a class="btn btn-ghost" asp-action="TopRecreational">Изчисти</a>
@@ -36,20 +51,24 @@ else
             <thead>
                 <tr>
                     <th>#</th>
-                    <th>Рибар</th>
-                    <th>Общ улов (кг)</th>
+                    <th>
+                        <a asp-action="TopRecreational" asp-route-search="@search" asp-route-sortBy="fisher" asp-route-sortDir='@NextSortDir("fisher")'>Рибар@SortIndicator("fisher")</a>
+                    </th>
+                    <th>
+                        <a asp-action="TopRecreational" asp-route-search="@search" asp-route-sortBy="catch" asp-route-sortDir='@NextSortDir("catch")'>Общ улов (кг)@SortIndicator("catch")</a>
+                    </th>
                 </tr>
             </thead>
             <tbody>
-            @foreach (var item in Model)
-            {
-                rank++;
-                <tr>
-                    <td><span class="table-pill">@(rank)</span></td>
-                    <td>@item.FisherName</td>
-                    <td>@item.TotalKg.ToString("F2")</td>
-                </tr>
-            }
+                @foreach (var item in Model)
+                {
+                    rank++;
+                    <tr>
+                        <td><span class="table-pill">@(rank)</span></td>
+                        <td>@item.FisherName</td>
+                        <td>@item.TotalKg.ToString("F2")</td>
+                    </tr>
+                }
             </tbody>
         </table>
     </section>

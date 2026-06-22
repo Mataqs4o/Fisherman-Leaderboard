@@ -1,8 +1,21 @@
+@using System
 @model IEnumerable<Fisherman_Board.ViewModels.ExpiringPermitViewModel>
 @{
     ViewData["Title"] = "Изтичащи разрешителни";
     var search = ViewData["Search"]?.ToString() ?? string.Empty;
+    var sortBy = ViewData["SortBy"]?.ToString() ?? "validTo";
+    var sortDir = ViewData["SortDir"]?.ToString() ?? "asc";
     var today = DateTime.UtcNow.Date;
+
+    string NextSortDir(string column) =>
+        string.Equals(sortBy, column, StringComparison.OrdinalIgnoreCase) && sortDir == "asc"
+            ? "desc"
+            : "asc";
+
+    string SortIndicator(string column) =>
+        string.Equals(sortBy, column, StringComparison.OrdinalIgnoreCase)
+            ? (sortDir == "asc" ? " ▲" : " ▼")
+            : string.Empty;
 }
 
 <section class="page-header-card">
@@ -15,6 +28,8 @@
 
 <section class="toolbar-card">
     <form class="search-form" method="get">
+        <input type="hidden" name="sortBy" value="@sortBy" />
+        <input type="hidden" name="sortDir" value="@sortDir" />
         <input type="search" name="search" value="@search" placeholder="Търсене по маркировка или международен номер" />
         <button type="submit" class="btn btn-primary-soft">Търси</button>
         <a class="btn btn-ghost" asp-action="ExpiringPermits">Изчисти</a>
@@ -35,23 +50,31 @@ else
         <table class="table table-app">
             <thead>
                 <tr>
-                    <th>Маркировка</th>
-                    <th>Международен номер</th>
-                    <th>Валидно до</th>
-                    <th>Оставащи дни</th>
+                    <th>
+                        <a asp-action="ExpiringPermits" asp-route-search="@search" asp-route-sortBy="vessel" asp-route-sortDir='@NextSortDir("vessel")'>Маркировка@SortIndicator("vessel")</a>
+                    </th>
+                    <th>
+                        <a asp-action="ExpiringPermits" asp-route-search="@search" asp-route-sortBy="number" asp-route-sortDir='@NextSortDir("number")'>Международен номер@SortIndicator("number")</a>
+                    </th>
+                    <th>
+                        <a asp-action="ExpiringPermits" asp-route-search="@search" asp-route-sortBy="validTo" asp-route-sortDir='@NextSortDir("validTo")'>Валидно до@SortIndicator("validTo")</a>
+                    </th>
+                    <th>
+                        <a asp-action="ExpiringPermits" asp-route-search="@search" asp-route-sortBy="daysLeft" asp-route-sortDir='@NextSortDir("daysLeft")'>Оставащи дни@SortIndicator("daysLeft")</a>
+                    </th>
                 </tr>
             </thead>
             <tbody>
-            @foreach (var item in Model)
-            {
-                var daysLeft = Math.Max(0, (item.ValidTo.Date - today).Days);
-                <tr>
-                    <td>@item.VesselMarking</td>
-                    <td>@item.InternationalNumber</td>
-                    <td>@item.ValidTo.ToString("dd.MM.yyyy")</td>
-                    <td><span class="table-pill">@daysLeft дни</span></td>
-                </tr>
-            }
+                @foreach (var item in Model)
+                {
+                    var daysLeft = Math.Max(0, (item.ValidTo.Date - today).Days);
+                    <tr>
+                        <td>@item.VesselMarking</td>
+                        <td>@item.InternationalNumber</td>
+                        <td>@item.ValidTo.ToString("dd.MM.yyyy")</td>
+                        <td><span class="table-pill">@daysLeft дни</span></td>
+                    </tr>
+                }
             </tbody>
         </table>
     </section>
