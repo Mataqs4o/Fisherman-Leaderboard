@@ -277,6 +277,7 @@ public class RegistryController : Controller
     public async Task<IActionResult> CreateVessel(int? engineId = null)
     {
         await PopulateEngineOptionsAsync(engineId);
+
         return View("CreateVessel", new FishingVessel
         {
             EngineId = engineId ?? 0
@@ -381,6 +382,80 @@ public class RegistryController : Controller
     [ValidateAntiForgeryToken]
     public Task<IActionResult> DeleteBoat(int id) => DeleteVessel(id);
 
+    public async Task<IActionResult> Trips(string? search)
+    {
+        ViewData["Search"] = search;
+
+        if (!CanConnect())
+        {
+            return View(Array.Empty<FishingTrip>());
+        }
+
+        var query = _context.FishingTrips
+            .AsNoTracking()
+            .Include(trip => trip.FishingVessel)
+            .AsQueryable();
+
+        if (!string.IsNullOrWhiteSpace(search))
+        {
+            query = query.Where(trip =>
+                trip.FishingVessel.Marking.Contains(search) ||
+                trip.StartLocation.Contains(search) ||
+                trip.EndLocation.Contains(search));
+        }
+
+        var model = await query
+            .OrderByDescending(trip => trip.StartTime)
+            .ToListAsync();
+
+        return View(model);
+    }
+
+    public async Task<IActionResult> CreateTrip(string? returnTo = null)
+    {
+        ViewData["TripReturnTo"] = returnTo;
+
+        await PopulateVesselOptionsAsync();
+
+        return View(new FishingTrip
+        {
+            StartTime = DateTime.Now,
+            EndTime = DateTime.Now.AddHours(1)
+        });
+    }
+
+    [HttpPost]
+    [ValidateAntiForgeryToken]
+    public async Task<IActionResult> CreateTrip(FishingTrip trip, string? returnTo = null)
+    {
+        ViewData["TripReturnTo"] = returnTo;
+
+        await ValidateVesselSelectionAsync(trip.FishingVesselId);
+
+        if (trip.EndTime <= trip.StartTime)
+        {
+            ModelState.AddModelError(nameof(FishingTrip.EndTime), "Краят на излета трябва да бъде след началото.");
+        }
+
+        if (!ModelState.IsValid)
+        {
+            await PopulateVesselOptionsAsync(trip.FishingVesselId);
+            return View(trip);
+        }
+
+        _context.FishingTrips.Add(trip);
+        await _context.SaveChangesAsync();
+
+        SetStatus("Излетът беше добавен успешно.");
+
+        if (string.Equals(returnTo, nameof(CreateCatch), StringComparison.OrdinalIgnoreCase))
+        {
+            return RedirectToAction(nameof(CreateCatch), new { tripId = trip.Id });
+        }
+
+        return RedirectToAction(nameof(Catches));
+    }
+
     public async Task<IActionResult> Catches(string? search)
     {
         ViewData["Search"] = search;
@@ -410,16 +485,22 @@ public class RegistryController : Controller
         return View(model);
     }
 
-    public async Task<IActionResult> CreateCatch()
+    public async Task<IActionResult> CreateCatch(int? tripId = null)
     {
-        await PopulateTripOptionsAsync();
-        return View(new CatchRecord());
+        await PopulateTripOptionsAsync(tripId);
+
+        return View(new CatchRecord
+        {
+            FishingTripId = tripId ?? 0
+        });
     }
 
     [HttpPost]
     [ValidateAntiForgeryToken]
     public async Task<IActionResult> CreateCatch(CatchRecord catchRecord)
     {
+        await ValidateTripSelectionAsync(catchRecord.FishingTripId);
+
         if (!ModelState.IsValid)
         {
             await PopulateTripOptionsAsync(catchRecord.FishingTripId);
@@ -453,6 +534,8 @@ public class RegistryController : Controller
         {
             return NotFound();
         }
+
+        await ValidateTripSelectionAsync(catchRecord.FishingTripId);
 
         if (!ModelState.IsValid)
         {
@@ -513,6 +596,54 @@ public class RegistryController : Controller
         }
     }
 
+    private async Task PopulateVesselOptionsAsync(int? selectedVesselId = null)
+    {
+        var vessels = await _context.FishingVessels
+            .AsNoTracking()
+            .OrderBy(vessel => vessel.Marking)
+            .Select(vessel => new
+            {
+                vessel.Id,
+                Label = $"{vessel.Marking} / {vessel.InternationalNumber}"
+            })
+            .ToListAsync();
+
+        ViewBag.VesselOptions = new SelectList(vessels, "Id", "Label", selectedVesselId);
+        ViewBag.HasVessels = vessels.Count > 0;
+    }
+
+    private async Task ValidateVesselSelectionAsync(int vesselId)
+    {
+        if (vesselId <= 0 || !await _context.FishingVessels.AsNoTracking().AnyAsync(vessel => vessel.Id == vesselId))
+        {
+            ModelState.AddModelError(nameof(FishingTrip.FishingVesselId), "Изберете съществуваща лодка.");
+        }
+    }
+
+    private async Task PopulateTripOptionsAsync(int? selectedTripId = null)
+    {
+        var trips = await _context.FishingTrips
+            .AsNoTracking()
+            .OrderByDescending(trip => trip.StartTime)
+            .Select(trip => new
+            {
+                trip.Id,
+                Label = $"{trip.FishingVessel.Marking} / {trip.StartTime:dd.MM.yyyy HH:mm}"
+            })
+            .ToListAsync();
+
+        ViewBag.TripOptions = new SelectList(trips, "Id", "Label", selectedTripId);
+        ViewBag.HasTrips = trips.Count > 0;
+    }
+
+    private async Task ValidateTripSelectionAsync(int tripId)
+    {
+        if (tripId <= 0 || !await _context.FishingTrips.AsNoTracking().AnyAsync(trip => trip.Id == tripId))
+        {
+            ModelState.AddModelError(nameof(CatchRecord.FishingTripId), "Изберете съществуващ излет или добавете нов.");
+        }
+    }
+
     private void SetEngineReturnContext(string? returnTo, int? vesselId)
     {
         ViewData["EngineReturnTo"] = returnTo;
@@ -543,21 +674,6 @@ public class RegistryController : Controller
         }
 
         return "Двигателят беше добавен успешно.";
-    }
-
-    private async Task PopulateTripOptionsAsync(int? selectedTripId = null)
-    {
-        var trips = await _context.FishingTrips
-            .AsNoTracking()
-            .OrderByDescending(trip => trip.StartTime)
-            .Select(trip => new
-            {
-                trip.Id,
-                Label = $"{trip.FishingVessel.Marking} / {trip.StartTime:dd.MM.yyyy HH:mm}"
-            })
-            .ToListAsync();
-
-        ViewBag.TripOptions = new SelectList(trips, "Id", "Label", selectedTripId);
     }
 
     private void SetStatus(string message, string type = "success")
