@@ -280,7 +280,8 @@ public class RegistryController : Controller
 
         return View("CreateVessel", new FishingVessel
         {
-            EngineId = engineId ?? 0
+            EngineId = engineId ?? 0,
+            PermitValidTo = DateTime.Today.AddMonths(1)
         });
     }
 
@@ -467,6 +468,7 @@ public class RegistryController : Controller
 
         var query = _context.CatchRecords
             .AsNoTracking()
+            .Include(catchRecord => catchRecord.Person)
             .Include(catchRecord => catchRecord.FishingTrip)
                 .ThenInclude(trip => trip.FishingVessel)
             .AsQueryable();
@@ -475,6 +477,7 @@ public class RegistryController : Controller
         {
             query = query.Where(catchRecord =>
                 catchRecord.Species.Contains(search) ||
+                catchRecord.Person.FullName.Contains(search) ||
                 catchRecord.FishingTrip.FishingVessel.Marking.Contains(search));
         }
 
@@ -488,6 +491,7 @@ public class RegistryController : Controller
     public async Task<IActionResult> CreateCatch(int? tripId = null)
     {
         await PopulateTripOptionsAsync(tripId);
+        await PopulateFishermanOptionsAsync();
 
         return View(new CatchRecord
         {
@@ -500,10 +504,12 @@ public class RegistryController : Controller
     public async Task<IActionResult> CreateCatch(CatchRecord catchRecord)
     {
         await ValidateTripSelectionAsync(catchRecord.FishingTripId);
+        await ValidateFishermanSelectionAsync(catchRecord.PersonId);
 
         if (!ModelState.IsValid)
         {
             await PopulateTripOptionsAsync(catchRecord.FishingTripId);
+            await PopulateFishermanOptionsAsync(catchRecord.PersonId);
             return View(catchRecord);
         }
 
@@ -523,6 +529,8 @@ public class RegistryController : Controller
         }
 
         await PopulateTripOptionsAsync(catchRecord.FishingTripId);
+        await PopulateFishermanOptionsAsync(catchRecord.PersonId);
+
         return View(catchRecord);
     }
 
@@ -536,10 +544,12 @@ public class RegistryController : Controller
         }
 
         await ValidateTripSelectionAsync(catchRecord.FishingTripId);
+        await ValidateFishermanSelectionAsync(catchRecord.PersonId);
 
         if (!ModelState.IsValid)
         {
             await PopulateTripOptionsAsync(catchRecord.FishingTripId);
+            await PopulateFishermanOptionsAsync(catchRecord.PersonId);
             return View(catchRecord);
         }
 
@@ -641,6 +651,30 @@ public class RegistryController : Controller
         if (tripId <= 0 || !await _context.FishingTrips.AsNoTracking().AnyAsync(trip => trip.Id == tripId))
         {
             ModelState.AddModelError(nameof(CatchRecord.FishingTripId), "Изберете съществуващ излет или добавете нов.");
+        }
+    }
+
+    private async Task PopulateFishermanOptionsAsync(int? selectedPersonId = null)
+    {
+        var fishermen = await _context.People
+            .AsNoTracking()
+            .OrderBy(person => person.FullName)
+            .Select(person => new
+            {
+                person.Id,
+                Label = person.FullName
+            })
+            .ToListAsync();
+
+        ViewBag.FishermanOptions = new SelectList(fishermen, "Id", "Label", selectedPersonId);
+        ViewBag.HasFishermen = fishermen.Count > 0;
+    }
+
+    private async Task ValidateFishermanSelectionAsync(int personId)
+    {
+        if (personId <= 0 || !await _context.People.AsNoTracking().AnyAsync(person => person.Id == personId))
+        {
+            ModelState.AddModelError(nameof(CatchRecord.PersonId), "Изберете съществуващ рибар.");
         }
     }
 
