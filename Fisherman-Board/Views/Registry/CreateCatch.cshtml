@@ -5,6 +5,9 @@
     ViewData["Title"] = "Добавяне на улов";
     var trips = ViewBag.TripOptions as SelectList;
     var hasTrips = ViewBag.HasTrips as bool? ?? (trips?.Any() ?? false);
+
+    var fishermen = ViewBag.FishermanOptions as SelectList;
+    var hasFishermen = ViewBag.HasFishermen as bool? ?? (fishermen?.Any() ?? false);
 }
 
 <section class="page-header-card">
@@ -12,7 +15,7 @@
         <span class="eyebrow">Нов запис</span>
         <h1>Добавяне на улов</h1>
     </div>
-    <p>Попълнете вида риба, количеството и свързания излет.</p>
+    <p>Попълнете рибаря, вида риба, количеството и свързания излет.</p>
 </section>
 
 <section class="form-card">
@@ -20,6 +23,26 @@
         <div asp-validation-summary="All" class="validation-summary text-danger"></div>
 
         <div class="form-grid">
+            <div class="form-field">
+                <label asp-for="PersonId"></label>
+
+                @if (hasFishermen)
+                {
+                    <select asp-for="PersonId" asp-items="fishermen" class="form-select">
+                        <option value="">Изберете рибар</option>
+                    </select>
+                }
+                else
+                {
+                    <div class="engine-helper-card">
+                        <strong>Няма добавени рибари.</strong>
+                        <span>Първо добавете рибар от регистъра.</span>
+                    </div>
+                }
+
+                <span asp-validation-for="PersonId" class="text-danger"></span>
+            </div>
+
             <div class="form-field">
                 <label asp-for="Species"></label>
                 <input asp-for="Species" class="form-control" />
@@ -57,7 +80,7 @@
         </div>
 
         <div class="form-actions">
-            <button type="submit" class="btn btn-primary-soft" @(hasTrips ? null : "disabled")>Запази</button>
+            <button type="submit" class="btn btn-primary-soft" @(hasTrips && hasFishermen ? null : "disabled")>Запази</button>
             <a class="btn btn-ghost" asp-action="Catches">Отказ</a>
         </div>
     </form>

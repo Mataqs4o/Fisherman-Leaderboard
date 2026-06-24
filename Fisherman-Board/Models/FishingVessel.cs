@@ -45,6 +45,12 @@ public class FishingVessel
     [ValidateNever]
     public Engine Engine { get; set; } = null!;
 
+    [Display(Name = "Разрешително валидно до")]
+    public DateTime PermitValidTo { get; set; } = DateTime.Today.AddMonths(1);
+
+    [Display(Name = "Разрешителното е отнето")]
+    public bool IsPermitRevoked { get; set; }
+
     [ValidateNever]
     public ICollection<VesselOwner> Owners { get; set; } = new List<VesselOwner>();
 

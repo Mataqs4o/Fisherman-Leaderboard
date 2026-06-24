@@ -20,30 +20,35 @@
 {
     <section class="content-card note-card">
         <strong>Текущ двигател: @selectedEngineLabel</strong>
-        <span>Ако сте добавили нов двигател, той вече е избран. Натиснете „Запази промените“, за да се обнови и записът за лодката.</span>
+        <span>Ако сте добавили нов двигател, той вече е избран. Натиснете „Запази промените“.</span>
     </section>
 }
 
 <section class="form-card">
     <form method="post" asp-action="EditBoat">
         <input asp-for="Id" type="hidden" />
+
         <div asp-validation-summary="All" class="validation-summary text-danger"></div>
+
         <div class="form-grid">
             <div class="form-field">
                 <label asp-for="Marking"></label>
                 <input asp-for="Marking" class="form-control" />
                 <span asp-validation-for="Marking" class="text-danger"></span>
             </div>
+
             <div class="form-field">
                 <label asp-for="InternationalNumber"></label>
                 <input asp-for="InternationalNumber" class="form-control" />
                 <span asp-validation-for="InternationalNumber" class="text-danger"></span>
             </div>
+
             <div class="form-field">
                 <label asp-for="CallSign"></label>
                 <input asp-for="CallSign" class="form-control" />
                 <span asp-validation-for="CallSign" class="text-danger"></span>
             </div>
+
             <div class="form-field">
                 <div class="field-heading">
                     <label asp-for="EngineId"></label>
@@ -66,25 +71,41 @@
 
                 <span asp-validation-for="EngineId" class="text-danger"></span>
             </div>
+
             <div class="form-field">
                 <label asp-for="Length"></label>
                 <input asp-for="Length" class="form-control" />
                 <span asp-validation-for="Length" class="text-danger"></span>
             </div>
+
             <div class="form-field">
                 <label asp-for="Width"></label>
                 <input asp-for="Width" class="form-control" />
                 <span asp-validation-for="Width" class="text-danger"></span>
             </div>
+
             <div class="form-field">
                 <label asp-for="Tonnage"></label>
                 <input asp-for="Tonnage" class="form-control" />
                 <span asp-validation-for="Tonnage" class="text-danger"></span>
             </div>
+
             <div class="form-field">
                 <label asp-for="Draft"></label>
                 <input asp-for="Draft" class="form-control" />
                 <span asp-validation-for="Draft" class="text-danger"></span>
+            </div>
+
+            <div class="form-field">
+                <label asp-for="PermitValidTo"></label>
+                <input asp-for="PermitValidTo" class="form-control" type="date" />
+                <span asp-validation-for="PermitValidTo" class="text-danger"></span>
+            </div>
+
+            <div class="form-field">
+                <label asp-for="IsPermitRevoked"></label>
+                <input asp-for="IsPermitRevoked" type="checkbox" />
+                <span asp-validation-for="IsPermitRevoked" class="text-danger"></span>
             </div>
         </div>
 

@@ -1,8 +1,13 @@
 @model Fisherman_Board.Models.CatchRecord
 @using Microsoft.AspNetCore.Mvc.Rendering
+@using System.Linq
 @{
     ViewData["Title"] = "Редакция на улов";
     var trips = ViewBag.TripOptions as SelectList;
+    var hasTrips = ViewBag.HasTrips as bool? ?? (trips?.Any() ?? false);
+
+    var fishermen = ViewBag.FishermanOptions as SelectList;
+    var hasFishermen = ViewBag.HasFishermen as bool? ?? (fishermen?.Any() ?? false);
 }
 
 <section class="page-header-card">
@@ -14,31 +19,67 @@
 </section>
 
 <section class="form-card">
-    <form method="post">
+    <form method="post" asp-action="EditCatch">
         <input asp-for="Id" type="hidden" />
-        <div asp-validation-summary="ModelOnly" class="validation-summary"></div>
+
+        <div asp-validation-summary="All" class="validation-summary text-danger"></div>
+
         <div class="form-grid">
+            <div class="form-field">
+                <label asp-for="PersonId"></label>
+
+                @if (hasFishermen)
+                {
+                    <select asp-for="PersonId" asp-items="fishermen" class="form-select">
+                        <option value="">Изберете рибар</option>
+                    </select>
+                }
+                else
+                {
+                    <div class="engine-helper-card">
+                        <strong>Няма добавени рибари.</strong>
+                        <span>Първо добавете рибар от регистъра.</span>
+                    </div>
+                }
+
+                <span asp-validation-for="PersonId" class="text-danger"></span>
+            </div>
+
             <div class="form-field">
                 <label asp-for="Species"></label>
                 <input asp-for="Species" class="form-control" />
                 <span asp-validation-for="Species" class="text-danger"></span>
             </div>
+
             <div class="form-field">
                 <label asp-for="QuantityKg"></label>
                 <input asp-for="QuantityKg" class="form-control" />
                 <span asp-validation-for="QuantityKg" class="text-danger"></span>
             </div>
+
             <div class="form-field">
                 <label asp-for="FishingTripId"></label>
-                <select asp-for="FishingTripId" asp-items="trips" class="form-select">
-                    <option value="">Изберете излет</option>
-                </select>
+
+                @if (hasTrips)
+                {
+                    <select asp-for="FishingTripId" asp-items="trips" class="form-select">
+                        <option value="">Изберете излет</option>
+                    </select>
+                }
+                else
+                {
+                    <div class="engine-helper-card">
+                        <strong>Няма добавени излети.</strong>
+                        <span>Първо добавете излет.</span>
+                    </div>
+                }
+
                 <span asp-validation-for="FishingTripId" class="text-danger"></span>
             </div>
         </div>
 
         <div class="form-actions">
-            <button type="submit" class="btn btn-primary-soft">Запази промените</button>
+            <button type="submit" class="btn btn-primary-soft" @(hasTrips && hasFishermen ? null : "disabled")>Запази промените</button>
             <a class="btn btn-ghost" asp-action="Catches">Отказ</a>
         </div>
     </form>
