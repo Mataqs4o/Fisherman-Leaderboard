@@ -33,6 +33,9 @@ namespace Fisherman_Board.Migrations
                     b.Property<int>("FishingTripId")
                         .HasColumnType("int");
 
+                    b.Property<int>("PersonId")
+                        .HasColumnType("int");
+
                     b.Property<double>("QuantityKg")
                         .HasColumnType("float");
 
@@ -44,6 +47,8 @@ namespace Fisherman_Board.Migrations
                     b.HasKey("Id");
 
                     b.HasIndex("FishingTripId");
+
+                    b.HasIndex("PersonId");
 
                     b.ToTable("CatchRecords");
                 });
@@ -198,6 +203,9 @@ namespace Fisherman_Board.Migrations
                         .HasMaxLength(80)
                         .HasColumnType("nvarchar(80)");
 
+                    b.Property<bool>("IsPermitRevoked")
+                        .HasColumnType("bit");
+
                     b.Property<double>("Length")
                         .HasColumnType("float");
 
@@ -205,6 +213,9 @@ namespace Fisherman_Board.Migrations
                         .IsRequired()
                         .HasMaxLength(80)
                         .HasColumnType("nvarchar(80)");
+
+                    b.Property<DateTime>("PermitValidTo")
+                        .HasColumnType("datetime2");
 
                     b.Property<double>("Tonnage")
                         .HasColumnType("float");
@@ -540,7 +551,15 @@ namespace Fisherman_Board.Migrations
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
+                    b.HasOne("Fisherman_Board.Models.Person", "Person")
+                        .WithMany()
+                        .HasForeignKey("PersonId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
                     b.Navigation("FishingTrip");
+
+                    b.Navigation("Person");
                 });
 
             modelBuilder.Entity("Fisherman_Board.Models.FishingGear", b =>
