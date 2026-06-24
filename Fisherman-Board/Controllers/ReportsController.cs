@@ -31,15 +31,20 @@ public class ReportsController : Controller
         var now = DateTime.UtcNow;
         var nextMonth = now.AddMonths(1);
         var yearStart = new DateTime(now.Year, 1, 1);
+        var yearEndExclusive = yearStart.AddYears(1);
+        var validToCutoff = yearEndExclusive.AddDays(-1);
 
-        model.ExpiringPermitCount = await _context.FishingPermits
+        model.ExpiringPermitCount = await _context.FishingVessels
             .AsNoTracking()
-            .CountAsync(permit => !permit.IsRevoked && permit.ValidTo >= now && permit.ValidTo <= nextMonth);
+            .CountAsync(vessel =>
+                !vessel.IsPermitRevoked &&
+                vessel.PermitValidTo >= now &&
+                vessel.PermitValidTo <= nextMonth);
 
-        model.RecreationalRankingCount = await _context.RecreationalCatches
+        model.RecreationalRankingCount = await _context.CatchRecords
             .AsNoTracking()
-            .Where(catchRecord => catchRecord.CatchDate >= now.AddYears(-1))
-            .GroupBy(catchRecord => catchRecord.RecreationalTicket.PersonId)
+            .Where(catchRecord => catchRecord.FishingTrip.StartTime >= now.AddYears(-1))
+            .GroupBy(catchRecord => catchRecord.PersonId)
             .CountAsync();
 
         model.VesselStatsCount = await _context.FishingTrips
@@ -50,13 +55,13 @@ public class ReportsController : Controller
 
         model.CarbonRankingCount = await GetCarbonFootprintQuery().CountAsync();
 
-        var leader = await _context.RecreationalCatches
+        var leader = await _context.CatchRecords
             .AsNoTracking()
-            .Where(catchRecord => catchRecord.CatchDate >= now.AddYears(-1))
+            .Where(catchRecord => catchRecord.FishingTrip.StartTime >= now.AddYears(-1))
             .GroupBy(catchRecord => new
             {
-                catchRecord.RecreationalTicket.PersonId,
-                catchRecord.RecreationalTicket.Person.FullName
+                catchRecord.PersonId,
+                catchRecord.Person.FullName
             })
             .Select(group => new
             {
@@ -70,12 +75,12 @@ public class ReportsController : Controller
             .FirstOrDefaultAsync();
 
         model.RecreationalLeaderSummary = leader is null
-            ? "Няма данни за класацията на любителите."
-            : $"{leader.Fisher} е водещ рибар любител с {leader.TotalKg:F1} кг.";
+            ? "Няма данни за класацията на рибарите."
+            : $"{leader.Fisher} е водещ рибар с {leader.TotalKg:F1} кг.";
 
         model.CarbonLeaderSummary = lowestFootprint is null
             ? "Няма валидни данни за въглеродния отпечатък."
-            : $"{lowestFootprint.VesselMarking} е най-ефективният кораб с {lowestFootprint.CarbonPerKg:F2} л/кг.";
+            : $"{lowestFootprint.VesselMarking} е най-ефективната лодка с {lowestFootprint.CarbonPerKg:F2} л/кг.";
 
         return View(model);
     }
@@ -84,6 +89,7 @@ public class ReportsController : Controller
     {
         var now = DateTime.UtcNow;
         var nextMonth = now.AddMonths(1);
+
         var normalizedSortBy = NormalizeSortBy(sortBy, "validTo", "vessel", "number", "validTo", "daysLeft");
         var normalizedSortDir = NormalizeSortDir(sortDir);
 
@@ -96,14 +102,17 @@ public class ReportsController : Controller
             return View(Array.Empty<ExpiringPermitViewModel>());
         }
 
-        var query = _context.FishingPermits
+        var query = _context.FishingVessels
             .AsNoTracking()
-            .Where(permit => !permit.IsRevoked && permit.ValidTo >= now && permit.ValidTo <= nextMonth)
-            .Select(permit => new ExpiringPermitViewModel
+            .Where(vessel =>
+                !vessel.IsPermitRevoked &&
+                vessel.PermitValidTo >= now &&
+                vessel.PermitValidTo <= nextMonth)
+            .Select(vessel => new ExpiringPermitViewModel
             {
-                VesselMarking = permit.FishingVessel.Marking,
-                InternationalNumber = permit.FishingVessel.InternationalNumber,
-                ValidTo = permit.ValidTo
+                VesselMarking = vessel.Marking,
+                InternationalNumber = vessel.InternationalNumber,
+                ValidTo = vessel.PermitValidTo
             });
 
         if (!string.IsNullOrWhiteSpace(search))
@@ -122,6 +131,7 @@ public class ReportsController : Controller
     public async Task<IActionResult> TopRecreational(string? search, string? sortBy, string? sortDir)
     {
         var oneYearAgo = DateTime.UtcNow.AddYears(-1);
+
         var normalizedSortBy = NormalizeSortBy(sortBy, "catch", "fisher", "catch");
         var normalizedSortDir = NormalizeSortDir(sortDir, "desc");
 
@@ -134,13 +144,13 @@ public class ReportsController : Controller
             return View(Array.Empty<TopRecreationalViewModel>());
         }
 
-        var query = _context.RecreationalCatches
+        var query = _context.CatchRecords
             .AsNoTracking()
-            .Where(catchRecord => catchRecord.CatchDate >= oneYearAgo)
+            .Where(catchRecord => catchRecord.FishingTrip.StartTime >= oneYearAgo)
             .GroupBy(catchRecord => new
             {
-                catchRecord.RecreationalTicket.PersonId,
-                catchRecord.RecreationalTicket.Person.FullName
+                catchRecord.PersonId,
+                catchRecord.Person.FullName
             })
             .Select(group => new TopRecreationalViewModel
             {
@@ -162,6 +172,7 @@ public class ReportsController : Controller
     public async Task<IActionResult> VesselStats(string? search, string? sortBy, string? sortDir)
     {
         var yearStart = new DateTime(DateTime.UtcNow.Year, 1, 1);
+
         var normalizedSortBy = NormalizeSortBy(
             sortBy,
             "catch",
@@ -174,6 +185,7 @@ public class ReportsController : Controller
             "avgCatch",
             "minCatch",
             "maxCatch");
+
         var normalizedSortDir = NormalizeSortDir(sortDir, "desc");
 
         ViewData["Search"] = search;
@@ -251,17 +263,13 @@ public class ReportsController : Controller
         var yearEndExclusive = yearStart.AddYears(1);
         var validToCutoff = yearEndExclusive.AddDays(-1);
 
-        var validVessels = _context.FishingPermits
-            .AsNoTracking()
-            .Where(permit => !permit.IsRevoked && permit.ValidTo >= validToCutoff)
-            .Select(permit => permit.FishingVesselId)
-            .Distinct();
-
         return _context.FishingTrips
             .AsNoTracking()
-            .Where(trip => trip.StartTime >= yearStart &&
-                           trip.EndTime < yearEndExclusive &&
-                           validVessels.Contains(trip.FishingVesselId))
+            .Where(trip =>
+                trip.StartTime >= yearStart &&
+                trip.EndTime < yearEndExclusive &&
+                !trip.FishingVessel.IsPermitRevoked &&
+                trip.FishingVessel.PermitValidTo >= validToCutoff)
             .GroupBy(trip => new
             {
                 trip.FishingVesselId,
@@ -298,12 +306,15 @@ public class ReportsController : Controller
             "vessel" => descending
                 ? query.OrderByDescending(item => item.VesselMarking)
                 : query.OrderBy(item => item.VesselMarking),
+
             "number" => descending
                 ? query.OrderByDescending(item => item.InternationalNumber)
                 : query.OrderBy(item => item.InternationalNumber),
+
             "daysLeft" => descending
                 ? query.OrderByDescending(item => item.ValidTo)
                 : query.OrderBy(item => item.ValidTo),
+
             _ => descending
                 ? query.OrderByDescending(item => item.ValidTo)
                 : query.OrderBy(item => item.ValidTo)
@@ -322,6 +333,7 @@ public class ReportsController : Controller
             "fisher" => descending
                 ? query.OrderByDescending(item => item.FisherName)
                 : query.OrderBy(item => item.FisherName),
+
             _ => descending
                 ? query.OrderByDescending(item => item.TotalKg)
                 : query.OrderBy(item => item.TotalKg)
@@ -340,27 +352,35 @@ public class ReportsController : Controller
             "vessel" => descending
                 ? query.OrderByDescending(item => item.VesselMarking)
                 : query.OrderBy(item => item.VesselMarking),
+
             "trips" => descending
                 ? query.OrderByDescending(item => item.TripsCount)
                 : query.OrderBy(item => item.TripsCount),
+
             "avgDuration" => descending
                 ? query.OrderByDescending(item => item.AvgTripDurationHours)
                 : query.OrderBy(item => item.AvgTripDurationHours),
+
             "minDuration" => descending
                 ? query.OrderByDescending(item => item.MinTripDurationHours)
                 : query.OrderBy(item => item.MinTripDurationHours),
+
             "maxDuration" => descending
                 ? query.OrderByDescending(item => item.MaxTripDurationHours)
                 : query.OrderBy(item => item.MaxTripDurationHours),
+
             "avgCatch" => descending
                 ? query.OrderByDescending(item => item.AvgCatchPerTrip)
                 : query.OrderBy(item => item.AvgCatchPerTrip),
+
             "minCatch" => descending
                 ? query.OrderByDescending(item => item.MinCatchPerTrip)
                 : query.OrderBy(item => item.MinCatchPerTrip),
+
             "maxCatch" => descending
                 ? query.OrderByDescending(item => item.MaxCatchPerTrip)
                 : query.OrderBy(item => item.MaxCatchPerTrip),
+
             _ => descending
                 ? query.OrderByDescending(item => item.TotalCatchKg)
                 : query.OrderBy(item => item.TotalCatchKg)
@@ -379,12 +399,15 @@ public class ReportsController : Controller
             "vessel" => descending
                 ? query.OrderByDescending(item => item.VesselMarking)
                 : query.OrderBy(item => item.VesselMarking),
+
             "catch" => descending
                 ? query.OrderByDescending(item => item.TotalCatchKg)
                 : query.OrderBy(item => item.TotalCatchKg),
+
             "fuel" => descending
                 ? query.OrderByDescending(item => item.TotalFuel)
                 : query.OrderBy(item => item.TotalFuel),
+
             _ => descending
                 ? query.OrderByDescending(item => item.CarbonPerKg)
                 : query.OrderBy(item => item.CarbonPerKg)
